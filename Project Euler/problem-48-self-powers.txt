@@ -1,0 +1,17 @@
+//Obviously 1000**1000 is too crazy of a number, but checking the lastDigits every iteration isn't!
+function selfPowers(power, lastDigits) {
+  let count = 0;
+  let last = 0;
+  for(let i = 1 ; i <= power ; i++){
+    let powered = 1;
+    for(let j = 0 ; j < i ; j++){
+      powered = (powered * i) % 10**lastDigits;
+      count++;
+    }
+    last = (last + powered) % 10**lastDigits;
+  }
+  console.log(count, last);
+  return last;
+}
+
+selfPowers(10,3)

@@ -1,0 +1,34 @@
+function pentagonNumbers() {
+  let count = 0;
+  for(let i = 1 ; i > 0 ; i++){
+    let pk = i*(3*i-1)/2;
+    for(let j = i - 1 ; j > 0 ; j--){
+      count++;
+      let pj = j*(3*j-1)/2;
+      if(isPandigital(pk-pj) && isPandigital(pk+pj)){
+        console.log(count, pk-pj);
+        return pk-pj;
+      }
+    }  
+  }
+}
+
+let pentagonals = [];
+
+console.log(pentagonals);
+pentagonNumbers();
+
+function isPandigital(pn){
+  //Deductions from quadratic function!
+  let tmp = Math.floor(Math.sqrt(1+24*pn));
+
+  if(tmp*tmp != 1 + 24*pn){
+    return false;
+  }
+  if((tmp + 1) % 6 != 0)
+  {
+    return false;
+  }
+  //console.log(pn);
+  return true;
+}

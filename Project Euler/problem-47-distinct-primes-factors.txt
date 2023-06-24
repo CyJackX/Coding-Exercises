@@ -1,0 +1,61 @@
+function distinctPrimeFactors(targetNumPrimes, targetConsecutive) {
+  let distinctFactorList = [];
+  let i = 3;
+  while(distinctFactorList.length < targetNumPrimes * targetConsecutive){
+    i++;
+    //console.log(i);
+    for(let j = 0 ; j < targetConsecutive ; j++){
+      let tmp = distinctFactors(i+j);
+      //console.log(i+j, tmp, tmp.length);
+      
+      if(isPrime(i+j) || tmp.length != targetNumPrimes ||
+      tmp.some(f => distinctFactorList.includes(f))
+      ){
+        distinctFactorList = [];
+        break;
+      }
+      distinctFactorList = distinctFactorList.concat(tmp);
+      //console.log(tmp);
+      //console.log(distinctFactorList);
+    }        
+  }
+  return i;
+}
+
+function isPrime(n){
+  if(n == 2){
+    return true;
+  }
+
+  if(n < 2 || n % 2 == 0){
+    return false;
+  }
+
+  for(let i = 3 ; i*i < n ; i+=2){
+    if(n % i == 0){
+      return false;
+    }
+  }
+  return true;
+}
+
+function distinctFactors(n){
+  let arr = [];
+  for(let i = 2 ; i*i <= n ; i++){
+    let count = 0;
+    while(n % i == 0){
+      count++;
+      n /= i;
+    }
+    if(count > 0){
+      arr.push([i, count]);
+    }
+  }
+  if(n > 1){
+    arr.push([n, 1]);
+  }
+  return arr;
+}
+
+console.log(distinctFactors(1000))
+distinctPrimeFactors(2, 2);

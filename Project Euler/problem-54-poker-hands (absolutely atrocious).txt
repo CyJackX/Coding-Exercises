@@ -1,0 +1,182 @@
+//This one looks like it'll be real open-ended how to deal with it...
+//I think an array of Rankings, the first one being the hand type, the remaining being tiebreakers.
+const vals = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'T':10,'J':11,'Q':12,'K':13,'A':14};
+const ranks = {
+    "High Card": 1,
+    "One Pair": 2,
+    "Two Pairs": 3,
+    "Three of a Kind": 4,
+    "Straight": 5,
+    "Flush": 6,
+    "Full House": 7,
+    "Four of a Kind": 8,
+    "Straight Flush": 9,
+    "Royal Flush": 10
+};
+
+function pokerHands(arr) {
+  let count = 0;
+  for(let round of arr){
+    let hands = round.split(' ');
+    let hand1 = sort(hands.slice(0,5));
+    let hand2 = sort(hands.slice(5));
+    let rank1 = handRank(hand1);
+    let rank2 = handRank(hand2);
+    //console.log(hand1, rank1, hand2, rank2);
+    if(ranks[rank1] > ranks[rank2]){
+      count++;
+    }
+    if(ranks[rank1] == ranks[rank2]){
+      if(tiebreaker(hand1,hand2)){
+        count++;
+      }
+    }
+    
+    //console.log(hand1, hand2);
+  }
+  console.log(count);
+  return count;
+}
+
+const testArr = [
+  '8C TS KC 9H 4S 7D 2S 5D 3S AC',
+  '5C AD 5D AC 9C 7C 5H 8D TD KS',
+  '3H 7H 6S KC JS QH TD JC 2D 8S',
+  'TH 8H 5C QS TC 9H 4D JC KS JS',
+  '7C 5H KC QH JD AS KH 4C AD 4S'
+];
+
+//This uses the fact that duplicates sorts its hands from greatest to least value in tiebreaking
+function tiebreaker(hand1, hand2){
+  let tie1 = duplicates(hand1);
+  let tie2 = duplicates(hand2);
+  for(let i = tie1.length - 1 ; i >= 0 ; i--){
+    let c1 = vals[tie1[i][0][0]];
+    let c2 = vals[tie2[i][0][0]];
+
+    if(c1 > c2){
+      return true;
+    }
+    if(c2 > c1){
+      return false;
+    }
+  }
+}
+
+function handRank(hand){
+  if(isSuited(hand)){
+    if(isStraight(hand)){
+      if(hand[4][0] == 'A'){
+        return 'Royal Flush'
+      }
+      return 'Straight Flush'
+    } else {
+      return 'Flush'
+    }
+  }
+  if(isStraight(hand)){
+    return 'Straight'
+  }
+  let dupes = duplicates(hand);
+
+  switch(dupes.length){
+    case 5: return 'High Card'
+    case 4: return 'One Pair'
+    case 3:
+      for(let sets of dupes){
+        if(sets.length == 3) {
+          return 'Three of a Kind'
+        }
+      }
+    return 'Two Pairs'
+    case 2:
+      if(dupes[0] == 1 || dupes[0] == 4){
+        return 'Four of a Kind'
+        }
+      return 'Full House'
+    default: return 'Not legal'
+  }
+
+  
+}
+
+//Assume sorted, returns the hand sorted into sets of duplicates
+function duplicates(hand){
+  let cards = [...hand];
+  let sets = [];
+  while(cards.length > 0){
+    let keycard = cards.splice(0,1);
+    //console.log("key:" + keycard);
+    let dupes = keycard;
+
+    while(cards.length && keycard[0][0] == cards[0][0]){      
+      dupes.push(cards.splice(0,1)[0]);      
+    }
+
+    
+    sets.push(dupes);
+  }
+  //Sort them into an easy tiebreaking format.
+  sets = sortSets(sets);
+  //console.log(sets);
+  return sets;
+}
+
+function isSuited(hand){
+  //console.log(hand);
+  return hand.reduce((bool, card) => hand[0][1] == card[1] && bool, true)
+}
+
+//Assume sorted
+function isStraight(hand){
+  for(let i = 1 ; i < 5 ; i++){
+    if(i == 4 && hand[4][0] == 'A' && hand[0][0] == '2'){
+      return true;
+    }
+    if(vals[hand[i][0]] - vals[hand[i-1][0]] != 1){
+      return false;
+    }
+  }
+  return true;
+}
+duplicates(sort(['5A','5B','2C','2C','2D']));
+function sort(hand){
+  let arr = hand;
+
+  for (let i = 1; i < arr.length; i++) {
+      let key = arr[i];
+      let j = i - 1;
+
+      while (j >= 0 && vals[arr[j][0]] > vals[key[0]]) {
+          arr[j + 1] = arr[j];
+          j = j - 1;
+      }
+      arr[j + 1] = key;
+  }
+  return arr;
+}
+
+//Just duplicated the sorting function but with a special comparison function...
+function sortSets(sets){
+  let arr = sets;
+
+  for (let i = 1; i < arr.length; i++) {
+      let key = arr[i];
+      let j = i - 1;
+
+      while (j >= 0 && compareSets(arr[j], key)) {
+          arr[j + 1] = arr[j];
+          j = j - 1;
+      }
+      arr[j + 1] = key;
+  }
+  return arr;
+}
+
+function compareSets(a, b){
+  if(a.length > b.length){
+    return true
+  }
+}
+
+pokerHands(testArr);

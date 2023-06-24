@@ -1,0 +1,21 @@
+function largeSum(arr) {
+  let sum = 0;
+  for(let element of arr){
+    sum+=parseInt(element);//sumitall i guess?
+  }
+  while(sum >= 9999999999){
+    sum /= 10;
+  } //I couldn't think of anything more clever quickly tbh
+
+  return Math.floor(sum);
+
+}
+
+// Only change code above this line
+
+const testNums = [
+  '37107287533902102798797998220837590246510135740250',
+  '46376937677490009712648124896970078050417018260538'
+];
+
+largeSum(testNums);

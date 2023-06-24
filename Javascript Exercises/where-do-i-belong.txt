@@ -1,0 +1,10 @@
+function getIndexToIns(arr, num) {
+  let count = 0; 
+  for(let elem of arr){
+    if(elem < num){
+      count++;
+    }
+  }
+  return count;
+}
+

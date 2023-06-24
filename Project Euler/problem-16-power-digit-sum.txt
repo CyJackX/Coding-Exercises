@@ -1,0 +1,10 @@
+function powerDigitSum(exponent) {
+  let int = BigInt(2**exponent).toString();
+  console.log(int);
+  let sum = 0;
+  for(let i = 0 ; i < int.length; i++){
+    sum += parseInt(int[i]);
+  }
+  console.log(sum);
+  return sum;
+}

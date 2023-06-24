@@ -1,0 +1,25 @@
+function sumAmicableNum(n) {
+  let sum = 0;
+  for (let a = 1; a < n; a++) {
+    let b = sumOfProperDivisors(a);
+    if(a != b && sumOfProperDivisors(b) == a){
+      sum += a + b;
+    }
+  }
+  //console.log(sum/2);
+  return sum/2;
+}
+
+function sumOfProperDivisors(n) {
+  let sum = 1;
+  for (let i = 2; i * i <= n; i++) {
+    if (n % i == 0) {
+      sum += i;
+      if (i * i != n) {
+        sum += n / i;
+      }
+    }
+  }
+  console.log("Sum of Proper Divisors of " + n + " is " +sum);
+  return sum;
+}

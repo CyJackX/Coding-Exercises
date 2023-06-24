@@ -1,0 +1,75 @@
+//This is a tougher one?  Kind of like the last one with permutations except digit replacement.  Can probably go along the same idea.
+
+//Just dumb making a solution that works for 6!
+
+function primeDigitReplacements(n) {
+
+  let i = 3; 
+  while(true){
+    let duplicateDigits = findDuplicateDigits(i);
+    if(i < 100){
+      duplicateDigits = [Math.floor(i/10)]; //Dumb but ok, how unhardcoded is enough
+    }
+    if(duplicateDigits.length > 0 && isPrime(i)){
+      for(let digit of duplicateDigits){ // Just in case a number has multiple duplicate digits?
+        let fam = buildFamily(i, digit);
+        //console.log(fam);
+        if(fam.filter(num => isPrime(num)).length == n){
+          console.log
+          console.log(i, fam);
+          return i;
+        }
+      }
+    } 
+    i += 2;    
+  }
+}
+
+primeDigitReplacements(7);
+
+//return a list of the digits replaced.
+function buildFamily(num, digit){
+  let arr = [];
+  let str = num.toString();
+  for(let i = digit ; i <= 9 ; i++){
+    arr.push(str.replaceAll(digit, i.toString()));
+  }
+  return arr.map(x => parseInt(x));
+}
+//console.log(buildFamily(56003,0));
+
+//Duplicate Digits
+function findDuplicateDigits(n) {
+    let digits = n.toString().split('');
+    let seenDigits = new Set();
+    let duplicates = new Set();
+
+    for (let digit of digits) {
+        if (seenDigits.has(digit)) {
+            duplicates.add(digit);
+        } else {
+            seenDigits.add(digit);
+        }
+    }
+
+    return Array.from(duplicates);
+}
+//console.log(findDuplicateDigits(56003));
+
+//isPrime brute force from scratch
+function isPrime(n){
+  if(n == 2){
+    return true;
+  }
+
+  if(n < 2 || n % 2 == 0){
+    return false;
+  }
+
+  for(let i = 3 ; i*i <= n ; i+=2){
+    if(n % i == 0){
+      return false;
+    }
+  }
+  return true;
+}

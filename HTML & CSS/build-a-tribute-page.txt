@@ -1,0 +1,54 @@
+** start of undefined **
+
+<doctype! html>
+  <html>
+
+  <head>
+    <link rel="stylesheet" href="styles.css">
+    <title>Tribute to Daft Punk</title>
+  </head>
+
+  <body>
+    <main id="main">
+      <h1 id="title">Daft Punk Tribute Page</h1>
+      <div id="img-div">
+        <img id="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Daft_Punk_in_2013.jpg/267px-Daft_Punk_in_2013.jpg">
+      <figcaption id="img-caption">Daft Punk was a popular House music duo in the early 2000s.</figcaption>
+      </div>      
+      <div id="tribute-info">
+        Daft Punk were a French electronic music duo formed in 1993 in Paris by Thomas Bangalter and Guy-Manuel de Homem-Christo. They achieved popularity in the late 1990s as part of the French house movement, combining elements of house music with funk, disco, techno, rock and synth-pop.[1] They garnered acclaim and commercial success and are regarded as one of the most influential acts in dance music.
+
+Daft Punk formed after their indie rock band, Darlin', disbanded. Their debut studio album, Homework, was released by Virgin Records in 1997 to positive reviews, backed by the singles "Around the World" and "Da Funk". From 1999, Daft Punk assumed robot personas for public appearances, with helmets, outfits and gloves to disguise their identities; they made few media appearances. They were managed from 1996 to 2008 by Pedro Winter, the head of Ed Banger Records.
+        </div>
+      <a href="https://en.wikipedia.org/wiki/Daft_Punk" id="tribute-link" target="_blank">Link to more!</a>
+
+
+
+    </main>
+  </body>
+
+  </html>
+
+** end of undefined **
+
+** start of undefined **
+
+body{
+  font-family:Tahoma;
+  background-color:black;
+  color:white;
+    width:75%;
+  margin:auto;
+}
+h1,a {
+  text-align:center;
+}
+img{
+  display:block;
+  margin:auto;
+  max-width:100%;
+}
+
+
+** end of undefined **
+

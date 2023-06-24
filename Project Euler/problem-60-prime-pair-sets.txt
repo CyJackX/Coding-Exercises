@@ -1,0 +1,70 @@
+var count = 0;
+//Something about this really doesn't like even a mild brute forcing...
+//Need a better way to prune this all...
+var list = [2];
+function primePairSets() {
+  for(let i = 3 ; i < 10000 ; i+=2){
+    if(isPrime(i)){
+      list.push(i);
+    }
+  }
+  console.log(list.length);
+  //console.log(list[list.length -1]**2);
+  let primes;
+
+  for(let j of list){
+    
+    primes = [j];
+    
+    for(let i of list){
+      if(isRemarkable(i,primes)){
+        primes.push(i);          
+      }      
+    }
+    //console.log(primes);
+    if(primes.length == 5){
+      console.log(primes);
+      return primes.reduce((sum,x) => sum + x,0);
+    }
+    console.log(j, count, primes);    
+  }
+  console.log("failed");
+}
+
+function isRemarkable(n, primes){
+  for(let prime of primes){
+    let a = parseInt("" + prime + n);
+    let b = parseInt("" + n + prime);
+    if(!isPrime(a) || !isPrime(b)){
+      return false
+    }
+  }
+  return true
+}
+
+function isPrime(n){
+  if(list.indexOf(n) >= 0){
+    return true;
+  }
+
+  if(n < 2 || n % 2 == 0){
+    return false;
+  }
+
+  for(let i = 0 ; list[i]**2 <= n ; i++){
+    count++;
+    if(n % list[i] == 0){
+      return false;
+    }
+  }
+
+  for(let i = list[list.length - 1] ; i*i <= n ; i+=2){
+    count++;
+    if(n % i == 0){
+      return false;
+    }
+  }
+  //console.log(n);
+  return true;
+}
+console.log(primePairSets());

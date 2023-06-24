@@ -1,0 +1,36 @@
+function doubleBasePalindromes(n) {
+  let sum = 0;
+  for(let i = n ; i > 0 ; i--){
+    //console.log(i);
+    if(isPalindrome(String(i)) && isPalindrome(toBinaryString(i))){
+      sum += i;
+      console.log(i);
+    }
+  }
+  //console.log(sum);
+  return sum;
+}
+
+
+function isPalindrome(str){
+  for(let i = 0 ; i < (str.length - 1)/2 ; i++){
+    if(str[i] != str[str.length - 1 - i]){
+      return false;
+    }
+  }
+  return true
+}
+
+function toBinaryString(num){
+  let str = '';
+  for(let i = Math.floor(Math.log2(num)) ; i >= 0 ; i--){
+    if(num >= 2**i){
+      num -= 2**i;
+      str += 1;
+    } else {
+      str += 0;
+    }
+  }
+  return str;
+}
+//console.log(isPalindrome((585).toString()) && isPalindrome(toBinaryString(585)));

@@ -1,0 +1,77 @@
+function countingSundays(firstYear, lastYear) {
+  let dayOfMonth = 1;
+  let month = 1;
+  let year = 1900;
+  let dayOfWeek = 1;
+  let count = 0;
+
+  while (year < firstYear) {
+    [dayOfMonth, month, year, dayOfWeek] = nextDay([dayOfMonth, month, year, dayOfWeek]);
+    //console.log(dayOfWeek, dayOfMonth);
+  }
+
+  while (year <= lastYear) {
+    if (dayOfWeek == 7 && dayOfMonth == 1) {
+      count++;
+    }   //this has to be first or else i missed one day in the overlap between these while loops
+    [dayOfMonth, month, year, dayOfWeek] = nextDay([dayOfMonth, month, year, dayOfWeek]);
+    //console.log(dayOfWeek, dayOfMonth);
+     
+  }
+  console.log(count);
+  return count;
+}
+
+function nextDay(date) {
+  let [dayOfMonth, month, year, dayOfWeek] = date;
+
+  dayOfWeek = (dayOfWeek % 7) + 1;
+  //I'd like to do something uber nice looking over repetitive, but also intuitive?  Are there simply too many edge cases?  I guess just IMPLEMENTATION first then!  Or embedded switches, etc?
+
+  if (isEndOfMonth(dayOfMonth, month, year)) {
+    dayOfMonth = 1;
+    if (month == 12) {
+      month = 1;
+      year++;
+    } else {
+      month++;
+    }
+  } else {
+    dayOfMonth++;
+  }
+  //console.log("Month:" + month + " Day:" + dayOfMonth + " Year:" + year + " was a " + dayOfWeek);
+  return [dayOfMonth, month, year, dayOfWeek];
+}
+
+
+//This seems like a good use of abstraction...
+function isEndOfMonth(day, month, year) {
+  switch (day) {
+    case 28:
+      return month == 2 && !isLeapYear(year);
+    case 29:
+      return month == 2;
+    case 30:
+      switch (month) {
+        case 4:
+        case 6:
+        case 9:
+        case 11:
+          return true;
+        default: return false;
+      }
+    case 31: return true;
+    default:
+      return false;
+  }
+}
+
+function isLeapYear(year) {
+  if (year % 400 == 0) {
+    return true;
+  }
+  if (year % 100 == 0) {
+    return false;
+  }
+  return year % 4 == 0;
+}

@@ -1,0 +1,12 @@
+//Seems pretty trivial with just...math?
+function powerfulDigitCounts(n) {
+  let count = 0;
+  for(let i = Math.ceil(10**((n-1)/n)) ; i**n < 10**n ; i++){
+    console.log(i**n);
+    count++;
+  }
+  console.log(count);
+  return count;
+}
+
+powerfulDigitCounts(1);

@@ -1,0 +1,17 @@
+//The relationships between numerator and denominator and successive iterations is pretty apparent.
+function squareRootConvergents(n) {
+  let count = 0;
+  let num = BigInt(3);
+  let den = BigInt(2);
+  for(let i = 2 ; i <= n ; i++){
+    [num,den] = [num+den+den,num+den];
+    console.log(num + "/" + den);
+    if(num.toString().length > den.toString().length){
+      count++;
+    }
+  }
+  return count;
+}
+
+//Looks like I'm going to have to break out the BigInt again...
+squareRootConvergents(1000);

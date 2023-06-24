@@ -1,0 +1,69 @@
+** start of undefined **
+
+<doctype! html>
+  <html>
+
+  <head>
+    <meta charset="utf-8">
+    <title>Certification page!</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+
+  <body>
+    <h1 id="title">This is a dope certification page.</h1>
+    <p id="description">Gosh I hope nobody ever reviews this for style or culture.</p>
+    <form id="survey-form">
+      <label id="name-label">Name:<input id="name" type="text" placeholder="Andy Zou" required></input></label>
+      <label id="email-label">Email:<input id="email" type="email" placeholder="Andy@AndyZou.com" required></input></label>
+      <label id="number-label">Number:<input id="number" type="number" min="0" max="69420" placeholder="420"></input></label>
+      <select id="dropdown">
+    <option>Whaddup haha</option>
+    <option>Pretty cool man</option>
+  </select>
+  <fieldset>
+      <label><input name="Keef" value="Reef" type="radio" class="inline"></input>Reef</label>
+      <label><input name="Keef" value="Keef" type="radio" class="inline"></input>Keef</label>
+      <label>Are you cool?<input type="checkbox" value="checkbox1" class="inline"></input></label>
+      <label>Like truly radical?<input type="checkbox" value="checkbox2" class="inline"></input></label>
+      <label>Tell us how awesome you are<textarea></textarea></label>
+      <input type="submit" id="submit"></input>
+      </fieldset>
+    </form>
+  </body>
+
+  </html>
+
+** end of undefined **
+
+** start of undefined **
+
+body {
+  width:75%;
+  margin:auto;
+  background-color:green;
+  color:white;
+}
+h1,p{
+  text-align:center;
+}
+input {
+  width:100%;
+  margin-bottom:1em;
+}
+
+.inline{
+  width:unset;  
+}
+
+fieldset{
+  border:none;
+}
+label{
+  display:block;
+}
+textarea{
+  width:100%;
+}
+
+** end of undefined **
+

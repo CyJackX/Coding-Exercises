@@ -1,0 +1,27 @@
+function primeSummation(n) {
+  let sum = 2;
+  let next = 3;
+  while(next<n){
+    if(checkPrime(next)){
+      sum += next;
+    }
+    next+=2;
+  }
+  return sum;
+}
+
+function checkPrime(n){
+  if(n%2==0){
+    return false;
+  }
+  let i = 3;
+  while (i <= Math.sqrt(n)){
+    if(n%i==0){
+      return false;
+    }
+    i+=2;
+  }
+  return true;
+}
+
+console.log(primeSummation(140759));

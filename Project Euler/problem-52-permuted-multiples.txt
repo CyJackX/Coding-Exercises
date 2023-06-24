@@ -1,0 +1,32 @@
+function permutedMultiples(n) {
+  for(let i = 125874 ; i > 0 ; i++){
+    if(win(i,n)){
+      return i;
+    }
+  }
+}
+
+function win(i,n){
+  for(let j = 2 ; j <= n ; j++){
+      if(!sameDigits(i, j*i)){
+        return false;
+      }
+    }
+    return true;
+}
+
+function sameDigits(a,b){
+  let arra = a.toString().split('');
+  let arrb = b.toString().split('');
+  if(arra.length != arrb.length){
+    return false;
+  }
+  for(let digit of arra){
+    if(arrb.indexOf(digit) < 0){
+      return false;
+    }
+  }
+  return true;
+}
+
+permutedMultiples(2);

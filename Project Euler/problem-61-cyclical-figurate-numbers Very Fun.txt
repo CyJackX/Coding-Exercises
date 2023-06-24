@@ -1,0 +1,78 @@
+function cyclicalFigurateNums(n) {
+  //Generate all the polygonal numbers and add them into a big ol' grid
+  let arr = [[],[],[],[],[],[]];
+  for(let n = 1 ; n*(n+1)/2 < 10000 ; n++){
+    arr[0].push(n*(n+1)/2);
+    arr[1].push(n*n);
+    arr[2].push(n*(3*n-1)/2);
+    arr[3].push(n*(2*n-1));
+    arr[4].push(n*(5*n-3)/2);
+    arr[5].push(n*(3*n-2));
+  }
+
+  //Filter 'em down to 4 digits.
+  for(let i = 0 ; i < arr.length ; i++){
+    arr[i] = arr[i].map(x => x.toString());
+    arr[i] = arr[i].filter(x => x.length == 4);
+  }
+
+  //Iteratively store candidates in another array of arrays.(Nevermind by the end)
+  //God, just realized it's not strictly in order...woof!
+
+  //Initialize with all triangular numbers.
+  let candidates = arr[0].map(x => [x]);
+  let results = crawl(candidates, arr.slice(1, n)); //Triangular numbers against the remaining up to n
+
+  
+  console.log(results);
+
+  //Clean up Data, when n = 5 there are duplicate numbers and sets.
+  results = results.map(x => x.sort()); //Sort each set
+  results = results.filter(x => !hasDuplicates(x)); //Remove each set with duplicates 
+  results = Array.from(new Set(results.map(JSON.stringify))).map(JSON.parse); //Remove each duplicate set
+  results = results.reduce((y, x) => y.concat(...x), []); //Turn them into one big array
+  results = results.map(x => parseInt(x)); //String to INt
+  
+  let result = results.reduce((sum, x) => sum + x, 0);
+  console.log(result);
+  return result;
+}
+
+//This function recursively crawls the candidates against the remaining arrays.
+function crawl(candidates, remaining){  
+
+  //Return condition, took me a second to figure out where to put it.
+  //Kept getting confused about doing it at the end...
+  if(!remaining.length){    
+    return candidates.filter(x => x[x.length - 1].substring(2,4) == x[0].substring(0,2));
+  }
+
+  //Based on the inner condition on the deepest loop, I think I just have to do all this a second last time?  Or do a second conditional on the inner loop....
+  //Nevermind, remembered how to do recursion.  Setup return condition first! up top!  remember!
+  let results = [];
+
+  for(let k = 0 ; k < remaining.length ; k++){
+
+    let test = remaining[k];
+    let nextRemaining = remaining.slice(0,k).concat(remaining.slice(k+1));
+    let nextCandidates = [];
+
+    for(let prevCandidate of candidates){
+      for(let nextCandidate of test){
+        if(prevCandidate[prevCandidate.length - 1].substring(2,4) == nextCandidate.substring(0,2)){
+          nextCandidates.push(prevCandidate.concat(nextCandidate));
+        }
+      }
+    }
+
+    results.push(...crawl(nextCandidates, nextRemaining));
+  }
+
+  return results;
+}
+
+function hasDuplicates(arr){
+  return arr.length != (new Set(arr)).size;
+}
+
+cyclicalFigurateNums(5);

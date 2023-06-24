@@ -1,0 +1,48 @@
+function goldbachsOtherConjecture() {
+  let i = 9;
+  while(isGoldbach(i)){
+    i+=2;
+    while(isPrime(i)){
+      i+=2;
+    } 
+  }
+  return i;
+}
+
+goldbachsOtherConjecture();
+
+function isPrime(n){
+  if(n == 2){
+    return true;
+  }
+
+  if(n < 2 || n % 2 == 0){
+    return false;
+  }
+
+  for(let i = 3 ; i*i < n ; i+=2){
+    if(n % i == 0){
+      return false;
+    }
+  }
+  return true;
+}
+
+function isSquare(n){
+  let tmp = Math.floor(Math.sqrt(n));
+  return tmp*tmp == n;
+}
+
+//Only receives composite numbers
+function isGoldbach(n){
+  if(isSquare((n-2)/2)){
+    return true
+  }
+
+  for(let i = 3 ; i < n ; i += 2){
+    if(isPrime(i) && isSquare((n-i)/2)){
+      return true
+    }
+  }
+  return false
+}

@@ -1,0 +1,99 @@
+//Let's try the brute force method first???
+// console.log(isPermutation("0123456789"));
+// function lexicographicPermutations(n) {
+//   //let perm = [0,1,2,3,4,5,6,7,8,9];
+//   //let perm = [0,1,2,3];
+//   // for(let i = 1 ; i <= n ; i++){ //Iterate through every permutation
+//   //   //since there are so many situations where it breaks or returns i should probably break down some helper functions...
+//   //   perm = nextperm(perm);
+//   // }
+//   //while()
+//   let perm = "0123456789"
+//   for(let i = 1 ; i < n ; i++){
+//     do {
+//       perm = String(Number(perm)+1);
+//       if(perm.length < 10){
+//         perm = "0"+perm;
+//       }
+//     } while(!isPermutation(perm))
+//   }
+//   return Number(perm);
+// }
+
+
+// function isPermutation(str){
+//   let arr = str.split('');
+//   for(let i = 0 ; i <= 9 ; i++){
+//     let once = false;
+//     for(let digit of arr){
+//       if(digit == i.toString()){
+//         once = true;
+//       }
+//     }
+//     if(!once){
+//       return false;
+//     }
+//   }
+//   return true;
+// }
+
+// for(let i = 1 ; i <= 25; i++){
+// console.log(lexicographicPermutations(i));
+// }
+
+//Okay, clearly the brute force method was never going to work,
+//but thinking about the factorials has led me to think I can work backwards from the left-most digits; since they only go up after factorial amounts.  I bet I could make an array of the digits and iterate through them from lowest to highest as I remove elements based on how many factorials you can fit into it.  An O(1) solution!
+function lexicographicPermutations(n) {
+  let perm = [0,1,2,3,4,5,6,7,8,9];
+  let ret = [];
+  for(let i = 9 ; i >=0 ; i--){
+    let f = factorial(i)
+    let j = 0;
+    while(n >= f){
+      n -= f;
+      j++;
+    }
+    ret.push(perm.splice(j,1));
+    //console.log(ret);
+  }
+  
+  return Number(ret.join(''));
+}
+function factorial(n){
+  let prod = 1;
+  for(let i = 2 ; i <= n ; i++){
+    prod*=i;
+  }
+  return prod;
+}
+console.log(lexicographicPermutations(1));
+for(let i = 699999 ; i <= 700000 ; i++){
+console.log(i+":"+lexicographicPermutations(i));
+}
+
+/*
+0123
+0132
+0213
+0231
+0312
+0321
+1023
+1032
+1203
+1230
+1302
+1320
+2013
+2031
+2103
+2130
+2301
+2310
+3012
+3021
+3102
+3120
+3201
+3210
+*/

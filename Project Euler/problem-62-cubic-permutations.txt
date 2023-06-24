@@ -1,0 +1,59 @@
+/*
+First brute force pass seems to work well enough.
+Might need to find a way to do it without a lot of repetitive calculations?
+Not sure if saving to an array is worthwhile.
+-
+Doesn't seem like brute forcing it is working.
+I think I can save on the sameDigit comparisons by assuming they have the same digits.
+
+*/
+var count = 0;
+function cubicPermutations(n) {
+
+  //Just the infinite loop going up by digits...
+  for(let digits = 3 ; digits < 13 ; digits++){
+    
+    //Create an array of the cubes with #digits
+    let arr = [];
+    for(let i = Math.ceil(10**((digits - 1)/3)) ; i**3 < 10**digits ; i++){
+      arr.push(i**3);
+    }
+    for(let i = 0 ; i < arr.length ; i++){
+      let permutations = 1;
+      for(let j = i + 1 ; j < arr.length ; j++){
+        count++;
+        if(isPermutation(arr[i],arr[j])){
+          permutations++;
+          //console.log(permutations, arr[i], arr[j]);
+          if(permutations == n){
+            console.log(arr[i], count);
+            return arr[i];
+          }
+        }
+      }
+    }
+  }  
+}
+/* Unnecessary after generating cube lists by digits.
+function sameDigits(a,b){
+  return Math.ceil(Math.log10(a)) == Math.floor(Math.log10(b));
+}
+*/
+
+function isPermutation(a,b){
+  a = a.toString().split('');
+  b = b.toString().split('');
+  while(a.length){
+    count++;
+    let i = b.indexOf(a[0]);
+    if(i >= 0){
+      b.splice(i,1);
+      a.shift();
+    } else {
+      return false
+    }
+  }
+  return b.length == 0;
+}
+//isPermutation(100,200);
+cubicPermutations(6);

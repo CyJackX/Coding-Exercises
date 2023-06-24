@@ -1,0 +1,137 @@
+const primes = [2,3,5,7,11,13,17];
+function substringDivisibility(n) {
+  // let sum = 0; 
+  // for(let i = 0 ; i < factorial(n + 1) ; i++){
+  //   sum += parseInt(lexicographicPermutations(i,n));    
+  // }
+  // console.log(sum);
+  // return sum;
+
+  return interestingPandigitalGenerator(n);
+}
+
+//this works... but maybe I can fold it into lexicographicPermutations?
+function isInteresting(str){
+  if(parseInt(str) < 1){
+    return false;
+  }
+  //let substringWidth = 2 + Math.floor(Math.log10(str.length));
+  for(let i = 1 ; i <= str.length - 3; i++){
+    let substring = parseInt(str.substring(i, i + 3));
+    
+    if(substring % primes[i - 1] != 0){
+      return false;
+    }
+    //console.log(substring);
+  }
+  return true;
+}
+/*
+Not necessary with a pandigital generator...
+function isPandigital(str){
+  for(let i = 0 ; i < str.length ; i++){
+    if(!str.includes(i.toString())){
+      return false;
+    }
+  }
+  return true;
+}
+*/
+
+//Seems like this takes too long for z = 9...
+function lexicographicPermutations(n, z) {
+
+  //Check if Out of bounds
+  if(n >= factorial(z+1)){
+    return null;
+  }
+
+  //Initialize digits
+  let perm = [];
+  for(let i = 0 ; i <= z ; i++){
+    perm.push(i);
+  }
+  //console.log(perm);
+
+  let ret = [];
+  for(let i = z ; i >=0 ; i--){
+    let f = factorial(i)
+    let j = Math.floor(n/f);
+    n = n % f
+    ret.push(perm.splice(j,1));
+    //console.log(ret);
+
+    //Check Just for "Interesting"
+    //Also seems like it's too long       
+    if(ret.length < 4){
+      continue;
+    }
+    let slice = ret.slice(ret.length - 3,ret.length).join(''); 
+    //console.log(slice);
+    if(parseInt(slice) % primes[ret.length - 4] != 0){
+      return '0';
+    }
+  }  
+
+  return ret.join('');
+}
+
+function factorial(n){
+  let prod = 1;
+  for(let i = 2 ; i <= n ; i++){
+    prod*=i;
+  }
+  return prod;
+}
+//console.log(isInteresting("1406357289"))
+//substringDivisibility(5);
+interestingPandigitalGenerator(9);
+
+//Gonna get really whacky with this one to see if we can start from Interesting Numbers and work backwards.
+function interestingPandigitalGenerator(n){
+  let arr = [];
+
+  //Generate the last set of 3 numbers and ensure they're already a multiple of the relevant prime.
+  for(let i = primes[n-3]; i < 1000 ; i += primes[n-3]){
+    let str = i.toString();
+    while(str.length < 3){
+      str = '0' + str;
+    }
+    arr.push(str);
+  }
+
+  //Filter out non-pandigitals
+  arr = arr.filter(number => number.split('').some(digit => Number(digit) > n) === false);
+  //Filter out duplicates
+  arr = arr.filter(number => !/(\d).*\1/.test(number));
+
+  while(arr[0].length <= n){//Do this loop until the number is n-digits long
+
+    //For each number, create a new array with the next digit that passes pandigital and interesting trait.
+    arr = arr.reduce((tmparr, num) => {
+      //console.log(num);
+      for(let i = 0 ; i <= n ; i++){ //Only numbers within Pandigital range
+        
+        if(num.includes(i.toString())){ //No duplicates
+          continue;
+        }
+        if(num.length == n){
+          tmparr.push(i.toString() + num);
+        }
+        let test = i*100 + parseInt(num.substring(0,2)); //Create the next 3 digits
+
+        //console.log("-" + test);
+        if(test % primes[n - num.length - 1] == 0){
+          //console.log("--" + test / primes[n - num.length - 1]);
+          tmparr.push(i.toString() + num);
+          //console.log(tmparr);
+        }      
+      }
+      return tmparr;
+    }, []);
+  }
+
+  
+  console.log(arr);
+  return arr.reduce((sum, str) => sum + parseInt(str),0);
+}

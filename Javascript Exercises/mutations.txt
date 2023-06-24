@@ -1,0 +1,19 @@
+function mutation(arr) {
+  let a = arr[0].toLowerCase();
+  let b = arr[1].toLowerCase();
+  for(let i = 0 ; i < b.length ; i++){
+    if(!letterCheck(a,b[i])){
+      return false;
+    }
+  }
+  return true;
+}
+function letterCheck(str, letter){
+  for(let i = 0 ; i < str.length ; i++){
+    if(letter == str[i]){
+      return true;
+    }
+  }
+  return false;
+}
+mutation(["hello", "hey"]);

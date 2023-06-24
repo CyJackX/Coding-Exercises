@@ -1,0 +1,30 @@
+function digitCancellingFractions() {
+  let answerNum = 1
+  let answerDenom = 1;
+  for(let denom = 99 ; denom >= 10 ; denom--){
+    for(let num = denom - 1 ; num >= 10 ; num--){
+      if(num % 11 == 0){
+        continue;
+      }
+      let tmpNum = Math.floor(num/10);
+      let tmpDenom = denom % 10;
+      let digitNum = num % 10;
+      let digitDenom = Math.floor(denom/10);
+      
+      if ((num * tmpDenom == denom * tmpNum) && (digitNum == digitDenom)){
+        console.log(num +'/'+ denom + "?=" + tmpNum + "/" + tmpDenom);
+        answerNum *= tmpNum;
+        answerDenom *= tmpDenom;
+      }
+    }
+  }
+  for(let i = 2 ; i * i < answerNum ; i++){
+    while(answerNum % i == 0 && answerDenom % i ==0){
+      answerNum /= i;
+      answerDenom /= i;
+    }
+  }
+  return answerDenom;
+}
+
+digitCancellingFractions();

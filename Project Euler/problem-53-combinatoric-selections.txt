@@ -1,0 +1,41 @@
+function combinatoricSelections(limit) {
+  let count = 0;
+  for(let i = 1 ; i <= 100 ; i++){
+    for(let r = 1 ; r < i ; r++){
+      if(dumbCombinator(i,r) > limit){
+        console.log(i, r);
+        count+= i - 2* r + 1; //Optimization
+        break;
+      }
+    }
+  }
+  console.log(count);
+  return count;
+}
+
+//This combinator divides every step to keep both numbers manageable.
+function dumbCombinator(n,r){
+  let numerator = 1;
+  //let denominator = 1;
+  for(let i = r + 1 ; i <= n ; i++){
+    //console.log(i, i-r);
+    numerator *= i/(i - r);
+
+    //I guess I was too worried about float values so I made this but I guess not necessary.
+    // denominator *= i - r; 
+    // let gcf = gcd(numerator,denominator);
+    // numerator /= gcf;
+    // denominator /= gcf;
+    //console.log(numerator, denominator);
+  }
+  return numerator;
+}
+
+function gcd(a, b) {
+    while (b != 0) {
+        [a,b] = [b, a % b]; 
+    }
+    return a;
+}
+//console.log(dumbCombinator(23,13));
+//combinatoricSelections(1000000);

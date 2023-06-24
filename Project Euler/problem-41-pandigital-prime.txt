@@ -1,0 +1,44 @@
+var primes = [2];
+
+function pandigitalPrime(n) {  
+  for(let i = 3 ; i*i < 10**n ; i +=2){
+    if(isPrime(i)){
+      primes.push(i);
+    }    
+  }
+
+  for(let i = 10**n - 1 ; i > 1 ; i -= 2){
+    if(isPrime(i) && isPandigital(i.toString())){
+      return i;
+    }
+  }
+}
+
+
+function isPrime(i){
+  if(i < 2){
+    return false;
+  }
+  for(let prime of primes){
+      if(prime*prime > i){
+        return true;
+      }
+
+      if(i % prime == 0){
+        return false;
+      }
+
+    }
+  //primes.push(i);
+  return true;
+}
+function isPandigital(str){
+  for(let i = 1 ; i <= str.length ; i++){
+    if(!str.includes(i.toString())){
+      return false;
+    }
+  }
+  return true;
+}
+
+console.log(pandigitalPrime(7));

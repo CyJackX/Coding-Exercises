@@ -1,0 +1,31 @@
+function pandigitalMultiples(k) {
+  let max = 0; 
+  for(let i = 9999 ; i > 0 ; i--){
+    let n = 2;
+    let str = i.toString();
+    
+    while(str.length < k){
+      str += (i*n).toString();
+      n++;
+    }
+    if(str.length > k){
+      continue;
+    }
+    if(isPandigital(str) && parseInt(str) > max){
+      max = parseInt(str);
+    }
+  }
+
+  return max;
+}
+
+function isPandigital(str){
+  for(let i = 1 ; i <= str.length ; i++){
+    if(!str.includes(i.toString())){
+      return false;
+    }
+  }
+  return true;
+}
+
+console.log(pandigitalMultiples(8));

@@ -1,0 +1,49 @@
+/*Just working out the sizes of the numbers here, I believe the product has to be 4 digits.  
+If it's 5 digits, there aren't enough digits left for the left side (99*99 < 10000)
+If it's 3 digits, there are too many digits on the left side (100*100 > 999)
+but i need to generalize this idea.
+
+*/
+function pandigitalProducts(n) {
+
+  let prodDigits = Math.floor(n/2);
+  let multiplicandDigits = Math.floor((n - prodDigits)/2);
+  let sum = 0;
+  for(let i = 10**(prodDigits - 1) ; i < 10**prodDigits ; i++){
+    
+    if(noRepeats(i.toString())){
+      continue;
+    }
+    //console.log(i);
+    for(let j = 1 ; j * j < i ; j++){
+
+      if(i % j == 0){
+        let str = i.toString() + j.toString() + (i/j).toString();
+        //console.log(str);
+
+        if(isPanDigital(str) && str.length == n){
+          console.log(i,j,i/j);
+          sum += i;
+          break;
+        }
+      }
+    }
+  }
+
+  return sum;
+}
+
+function isPanDigital(str){
+  for(let i = 1 ; i <= str.length ; i++){
+    if(!str.includes(i.toString())){
+      return false;
+    }
+  }
+  return true;
+}
+
+function noRepeats(str){
+  return /(\d).*?\1/.test(str);
+}
+
+console.log(pandigitalProducts(9));

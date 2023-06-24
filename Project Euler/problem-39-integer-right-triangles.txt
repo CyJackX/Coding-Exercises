@@ -1,0 +1,35 @@
+function intRightTriangles(n) {
+  // let squares = [];
+  // for(let i = 1 ; i <= n ; i++){
+  //   squares.push(i*i);
+  // }
+  //console.log(squares);
+  let max = 0;
+  let maxp = 0;
+  for(let p = 12 ; p <= n ; p++){
+    let count = 0;
+    for(let c = p - 2 ; c >= 5 ; c--){
+      for(let b = 1 ; b <= (p-c)/2 ; b++){
+        let a = p - c - b;
+        if(a*a + b*b == c*c){
+          //console.log(p, a,b,c);
+          count++;
+        }
+      }
+    }
+    //console.log("perimeter:" + p + " has " + count + " solutions.");
+    if(count > max){
+      maxp = p;
+      max = count;
+    }
+  }
+  return maxp;
+
+}
+  
+
+function solutions(p){
+  let count = 0;
+
+}
+console.log(intRightTriangles(500));

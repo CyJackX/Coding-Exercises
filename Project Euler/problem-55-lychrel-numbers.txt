@@ -1,0 +1,36 @@
+function countLychrelNumbers(num) {
+  let count = 0;
+  for(let i = 1 ; i < num ; i++){
+    if(isLychrel(i)){
+      count++;
+    }
+  }
+  console.log(count);
+  return count;
+}
+function isLychrel(num){
+  for(let i = 0 ; i < 50 ; i++){
+    num += reverseNum(num);
+    if(isPalindromic(num)){
+      return false;
+    }  
+  }
+  return true;
+}
+
+function reverseNum(num){
+  return parseInt(num.toString().split('').reverse().join(''));
+}
+function isPalindromic(num){
+  let str = num.toString();
+  for(let i = 0 ; i < (str.length - 1) / 2 ; i++){
+    if(str[i] != str[str.length - 1 - i]){
+      return false;
+    }
+  }
+  return true;
+}
+
+
+countLychrelNumbers(10000);
+

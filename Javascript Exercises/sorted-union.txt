@@ -1,0 +1,13 @@
+function uniteUnique(arr) {
+  let newarr =[];
+  [...arguments].map(array => {
+    array.map(elem =>{
+      if(newarr.indexOf(elem)<0){
+        newarr.push(elem)
+      }
+    });
+  });
+  return newarr;
+}
+
+uniteUnique([1, 3, 2], [5, 2, 1, 4], [2, 1]);

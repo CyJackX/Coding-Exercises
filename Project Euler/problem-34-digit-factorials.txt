@@ -1,0 +1,34 @@
+function digitFactorial() {
+
+  var sum = 0;
+  var numbers = [];
+  for(let i = 3 ; i < 50000 ; i++){
+    if(i == digitFactSum(i)){
+      sum += i;
+      numbers.push(i);
+    }
+  }
+  return {"sum": sum, "numbers" : numbers };
+}
+
+function digitFactSum(n){
+  let sum = 0;
+  do {
+    sum+= facts[n%10];
+    n = Math.floor(n/10);
+  } while(n > 0)
+  return sum;
+}
+
+function factorial(n){
+  if (n <= 1) {
+    return 1;
+  }
+  return n * factorial(n-1);
+}
+
+let facts = [];
+for(let i = 0 ; i <= 9 ; i++){
+  facts.push(factorial(i));
+}
+console.log(digitFactorial());

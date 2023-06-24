@@ -1,0 +1,60 @@
+//Looks like this is an optimization problem; this is O(n^3) in a naive fashion...
+//Maybe I can store the abundant numbers and work off of it like primes?
+//Or start with the n(n+1)/2 sum and subtract...
+function sumOfNonAbundantNumbers(n) { 
+  
+  //Find all the abundants up to n...
+  let abundants = new Set();
+  for(let i = 1 ; i <= n ; i++){
+    if(isAbundant(i)){
+      abundants.add(i);
+    }
+  }
+  //console.log(abundants);
+  let sum = 0;
+  for(let i = 1 ; i <= n ; i++){
+    if(!canBeSumOfTwoAbundants(i, abundants)){
+      sum+=i;
+    }
+  }
+  console.log(sum);
+  return sum;
+}
+
+function canBeSumOfTwoAbundants(n, abundants){
+  for(let i = 1 ; i <= n/2 ; i++){
+    if(abundants.has(n-i) && abundants.has(i)){
+      return true;
+    }
+  }
+  return false;
+}
+
+function isAbundant(n){
+  let sum = 1;
+  for(let i = 2 ; i*i <= n ; i++){
+    if(n%i == 0){
+      if( i*i != n ){
+        sum+=n/i
+      }
+      sum += i;
+      if(sum > n){
+        return true;
+      }
+    }
+  }
+  return false;
+}
+/*  Don't even need the sum maybe...
+function sumProperDivisors(n){
+  let sum = 0;
+  for(let i = 2 ; i*i <= n ; i++){
+    if(n%i == 0){
+      if( i*i != n ){
+        sum+=n/i
+      }
+      sum += i;
+    }
+  }
+  return sum + 1;
+}*/

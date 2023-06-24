@@ -1,0 +1,32 @@
+
+//Clearly the simple method won't work for large n...
+function powerfulDigitSum(n) {
+  let max = 0;
+  for(let a = n - 1 ; a > 1 ; a--){
+    for(let b = n - 1 ; b > 1 ; b--){
+      
+      let sum = sumDigits(bigIntExp(a,b));
+      
+      if(sum > max){
+        console.log(a,b,bigIntExp(a,b), sum);
+        max = sum;
+      }
+    }
+  }
+  return max;
+}
+function bigIntExp(a,b){
+  a = BigInt(a);
+  let prod = BigInt(1);
+  for(let i = 0 ; i < b ; i++){
+    prod *= a;
+  }
+  return prod;
+}
+
+console.log(bigIntExp(10,50));
+function sumDigits(n){
+  return n.toString().split('').reduce((sum, digit) => sum + parseInt(digit),0);
+}
+
+powerfulDigitSum(3);

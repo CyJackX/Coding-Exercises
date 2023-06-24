@@ -1,0 +1,23 @@
+function longestCollatzSequence(limit) {
+  let max = 0;
+  let answer = 0;
+  for(let i = limit - 1 ; i > 0 ; i--){
+    let num = i;
+    let count = 1;
+    while(num != 1){//Count Collatz sequence
+      if (num%2==0){
+        num/=2;
+      } else {
+        num = 3*num + 1;
+      }
+      count++;
+    }
+    if(count > max){//Check if it's the highest one and record the number.
+      max = count;
+      answer = i;
+    }
+  }
+  return answer;
+}
+
+longestCollatzSequence(14);

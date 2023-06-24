@@ -1,0 +1,14 @@
+function champernownesConstant(n) {
+  if(n == 1){
+    return d(1);
+  }
+  return d(n) * champernownesConstant(n/10);
+}
+function d(n){
+  let i = 1;
+  for(; n > Math.floor(Math.log10(i)) + 1 ; i++){
+    n -= Math.floor(Math.log10(i)) + 1;
+  }
+  return parseInt(i.toString()[n - 1]);
+}
+console.log(champernownesConstant(1000000));

@@ -1,0 +1,24 @@
+function divisibleTriangleNumber(n) {
+  let triangle = 1;
+  let count = 2;
+  while(countDivisors(triangle) < n){
+    triangle += count;
+    count++;
+  }
+  console.log(triangle);
+  return triangle;
+  
+}
+function countDivisors(n){
+  let sum = 0;
+  for(let i = 1 ; i <= Math.sqrt(n) ; i++){
+    if(n%i == 0){
+      if(i*i == n){
+        sum++;
+      } else {
+        sum+=2;
+      }
+    }
+  }
+  return sum;
+}

@@ -1,0 +1,26 @@
+function maximumPathSumI(triangle) {
+  return maxTriangle(0,0,triangle);
+}
+//Recursive Solution?
+function maxTriangle(row, index, triangle){
+  console.log(row + " " + index);
+  let sum = triangle[row][index];
+
+  if(row < triangle.length - 1){ //If there's another row
+    let left = maxTriangle(row+1, index, triangle);
+    let right = maxTriangle(row+1, index+1, triangle);
+    if(left > right){
+      sum += left;
+    } else {
+      sum += right;
+    }
+  }
+  //If there's no more rows 
+  return sum;
+}
+const testTriangle = [[3, 0, 0, 0],
+                      [7, 4, 0, 0],
+                      [2, 4, 6, 0],
+                      [8, 5, 9, 3]];
+
+maximumPathSumI(testTriangle);

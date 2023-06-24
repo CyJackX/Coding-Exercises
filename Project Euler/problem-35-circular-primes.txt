@@ -1,0 +1,52 @@
+var primes = [2];
+for(let i = 3 ; i*i <= 1000000 ; i +=2){
+  if(isPrime(i)){
+    primes.push(i);
+  }    
+}
+
+function isPrime(i){
+  for(let prime of primes){
+      if(i == prime){
+        return true;
+      }
+
+      if(i % prime == 0){
+        return false;
+      }
+    }
+  //primes.push(i);
+  return true;
+}
+
+function circularPrimes(n) {
+
+  //console.log(primes);
+  let count = 1;
+  for(let i = 3 ; i <= n ; i+=2){
+    if(isCircular(i)){
+      //console.log(i);
+      count++;
+    }
+  }
+  console.log(n + " answer:"+ count);
+  return count;
+}
+
+function isCircular(i){
+  for(let j = 0 ; j <= Math.log(i) ; j++){
+    if(isPrime(i)){
+      i = rotate(i);
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
+function rotate(num){
+  let str = num.toString();
+  return parseInt(str[str.length - 1]+str.substring(0,str.length-1));
+}
+
+console.log(circularPrimes(250000));

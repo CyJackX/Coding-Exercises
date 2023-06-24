@@ -1,0 +1,17 @@
+function digitFibonacci(n) {
+  let f1 = 1;
+  let f2 = 1;
+  let i = 2;
+  while(f2 < 10**(n-1)){
+    [f1,f2] = [f2,nextFib(f1,f2)];
+    
+    i++;
+    //console.log(i+":"+f2, 10^(n-1));
+  }
+  return i;
+}
+
+function nextFib(n1,n2){
+  return n1+n2;
+}
+console.log(digitFibonacci(5));

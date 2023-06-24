@@ -1,0 +1,36 @@
+function reciprocalCycles(n) {
+  let max = {"d":0, "length":0};
+  for(let i = 7 ; i < n ; i+=2){
+    if(repetendLength(i) > max.length){
+      max = {"d":i,"length":repetendLength(i)};
+      console.log(max);
+    }
+  }
+  return max.d;
+}
+function repetendLength2(n){
+  // if(n%2==0 || n%5==0){
+  //   return 0;
+  // }
+  let i;
+  for(i = 1 ; 10**i % n != 1 ; i++){
+  }
+  return i;
+}
+function repetendLength(n){
+  if(n%2==0 || n%5==0){
+    return 0;
+  }
+  let dividend = 1;
+  let length = 0;
+  let quot;
+  do{
+    dividend *= 10;
+    dividend = dividend % n;
+    //console.log(dividend, quot)
+    length++;
+  } while(dividend != 1)
+    
+  return length;
+}
+console.log(repetendLength(659));

@@ -1,0 +1,39 @@
+function checkCashRegister(price, cash, cid) {
+  
+  let changeArray = [["PENNY", 0], ["NICKEL", 0], ["DIME", 0], ["QUARTER", 0], ["ONE", 0], ["FIVE", 0], ["TEN", 0], ["TWENTY", 0], ["ONE HUNDRED", 0]];
+  const currencyValues = { PENNY: 1, NICKEL: 5, DIME: 10, QUARTER: 25, ONE: 100, FIVE: 500, TEN: 1000, TWENTY: 2000, "ONE HUNDRED": 10000 }
+
+  function sumChange(cid) {
+    return cid.reduce((sum, row) => sum + row[1], 0);
+  }
+  cid = cid.map(denom => [denom[0],denom[1]*100]);
+  let changeDue = (cash - price)*100;
+  console.log(changeDue);
+  for (let i = 8; i >= 0; i--) {
+    let currency = currencyValues[cid[i][0]];
+    while (changeDue >= currency && cid[i][1] >= currency) {
+      cid[i][1] -= currency;
+      changeArray[i][1] += currency;
+      changeDue -= currency;
+    }
+  }
+
+  changeArray = changeArray.map(denom => [denom[0],denom[1]/100]);
+  console.log(changeDue, changeArray);
+  if (changeDue > 0) {
+    return { status: "INSUFFICIENT_FUNDS", change: [] };
+  }
+
+  if (sumChange(cid) == 0) {
+    return { status: "CLOSED", change: changeArray };
+  }
+
+  let finalArray = [];
+  changeArray.map(denom => {
+    if(denom[1] > 0){
+      finalArray.unshift(denom);
+    }
+  });
+  console.log(finalArray);
+  return { status: "OPEN", change: finalArray };
+}

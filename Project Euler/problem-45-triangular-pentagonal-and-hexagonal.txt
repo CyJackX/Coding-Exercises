@@ -1,0 +1,40 @@
+function triPentaHexa(n) {
+  for(let h = 144 ; h > 0 ; h++){
+    let hn = h*(2*h-1);
+    if(isPentagonal(hn) && isTriangular(hn)){
+      console.log(hn);
+      return hn;
+    }
+  }
+}
+
+function isPentagonal(pn){
+  //Deductions from quadratic function!
+  let tmp = Math.floor(Math.sqrt(1+24*pn));
+
+  if(tmp*tmp != 1 + 24*pn){
+    return false;
+  }
+  if((tmp + 1) % 6 != 0)
+  {
+    return false;
+  }
+  //console.log(pn);
+  return true;
+}
+
+function isTriangular(pn){
+  //Deductions from quadratic function!
+  let tmp = Math.floor(Math.sqrt(1+8*pn));
+
+  if(tmp*tmp != 1 + 8*pn){
+    return false;
+  }
+  if((tmp - 1) % 2 != 0)
+  {
+    return false;
+  }
+  //console.log(pn);
+  return true;
+}
+triPentaHexa(40756);
