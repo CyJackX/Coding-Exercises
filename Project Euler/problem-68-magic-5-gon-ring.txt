@@ -1,0 +1,120 @@
+/*
+Seems like an extension of the cyclic permutations bit.  Similar approach; going to try recursive function.
+--
+Kinda complex...made a pickThree function that picks three elements from a list?
+Might be able to use it to simplify a lot of it, actually, but it could be *kinda* dumb depending on how much of it I have to filter out?
+
+But also, I could make the list of permutations of 3 just once!
+Then, just repeatedly filter THAT for what I need.  Actually might be the best idea...
+
+--
+Took me all afternoon but figured out the recursive setup again
+Made the base case slightly complicated to not repeat myself.
+
+*/
+
+function magic5GonRing() {
+
+  let candidates = createRings(list.map(x => [x]));
+  console.log(candidates);
+
+  //Rotate to lowest external node
+  candidates.map(x => {
+    let firsts = x.map(triplet => triplet[0]);
+    let min = Math.min(...firsts);
+    while(x[0][0] != min){
+      x.push(x.shift());      
+    }
+    return x;
+  });
+
+  candidates = candidates.map(set => set.reduce((str, x) => str += x.join(''), ''));  
+  candidates = candidates.filter(x => x.length == 16);
+  let result = candidates.reduce((max, x) => max < parseInt(x) ? parseInt(x) : max, 0);
+
+  console.log(result);
+  return result;
+}
+
+function createRings(candidates) {
+
+  let nextCandidates = [];
+  for (let ring of candidates) {
+
+    let sum = sumarr(ring[0]);
+    for (let triplet of list) {
+      //console.log(ring,"begin");
+
+      if (triplet[1] != ring[ring.length - 1][2]) {
+        //console.log(triplet,"failed1");
+        continue
+      }
+
+      if (sumarr(triplet) != sum) {
+        //console.log(triplet,"failed2");
+        continue
+      }
+
+      if (ring.length < 4 && ringContains(ring, [triplet[0], triplet[2]])) {
+        //console.log(triplet,"failed3");
+        continue
+      }
+      
+      //Base case buried in here so as not to duplicate the other checks?
+      if (ring.length == 4) {
+        if (triplet[2] != ring[0][1]) {
+          continue
+        }
+        if (ringContains(ring, [triplet[0]])) {
+          continue
+        }
+      }
+
+      nextCandidates.push(ring.concat([triplet]));
+    }
+  }
+  //console.log(nextCandidates.length, "candidates");
+  //console.log(nextCandidates);
+
+  //2nd Base case check
+  if (nextCandidates[0].length == 5) {
+    return nextCandidates;
+  }
+  return createRings(nextCandidates);
+  // console.log(ring, "lead to a dead end");
+}
+
+
+function pickThree(arr) {
+  let list = [];
+  for (let a of arr) {
+    for (let b of arr) {
+      for (let c of arr) {
+        if (a == b || b == c || a == c) {
+          continue
+        }
+        let remaining = new Set(arr);
+        remaining.delete(a);
+        remaining.delete(b);
+        remaining.delete(c);
+        list.push([a, b, c]);
+      }
+    }
+  }
+  return list;
+}
+function sumarr(arr) {
+  return arr.reduce((sum, x) => sum + x, 0);
+}
+function hasOverlap(array1, array2) {
+  return array1.some(item => array2.includes(item));
+}
+function ringContains(ring, arr) {
+  ring = ring.reduce((acc, x) => acc.concat(x), []);
+  ring.pop();
+  ring = new Set(ring);
+  ring = Array.from(ring);
+  return hasOverlap(ring, arr);
+}
+const list = pickThree([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+magic5GonRing();
