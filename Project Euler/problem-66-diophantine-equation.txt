@@ -1,0 +1,93 @@
+/*
+Seems like there could be a mathy way to optimize this.
+
+Simple brute force only got me up to n = 100.
+
+--
+
+Was incrementing x by 1, but since x = sqrt(1+D*y^2), and x is always greater than y, I can search by y instead and go faster?
+--
+Doing research: This specific case is known as Pell's equation.  There is a fundamental solution for it.  Is this meant to be related to the previous cases continued fraction problems?
+--
+It seems that Pell's fundamental solutions are indeed meant to be solved with continued fractions...  Feels like a bit of a cheat to find this out via wiki/GPT but it's...the answer?  Not sure how I was supposed to derive it otherwise!  Proving Lagrange's theorem?  Maybe there was a more clever computational way...
+Let's try a square LIST first so I don't have to implement the theorem.
+--
+Won't work: Pell's Equation:
+x2−61y2=1
+has the smallest positive integral solution:
+x=1766319049
+y=226153980
+--
+time to make some generalized functions for future use
+--
+BigInts come to save the day again...
+
+*/
+console.log("start");
+diophantineEquation(100);
+for(let i = 0 ; i <= 10 ; i++){
+//  console.log(nthConvergent(i,continuedFractionsqrt(7)));
+}
+function diophantineEquation(n) {
+  let max = 0;
+  let answer = 0;
+
+  for(let D = 2 ; D <= n ; D++){
+    if(isSquare(D)){
+      continue;
+    }
+    
+    let x = BigInt(0);
+    let y = BigInt(0);
+    let arr = continuedFractionssqrt(D);
+    for(let k = 1 ; x*x - BigInt(D)*y*y != 1 ; k++){
+      [x,y] = nthConvergent(k,arr);
+    }
+
+    console.log(x + String.fromCharCode(178) + " - " + D +"x" + y + String.fromCharCode(178) + " = 1");
+    if(x > max){
+      max = x
+      answer = D;
+    }
+  }
+  console.log(answer, max);
+  return answer;
+}
+
+function continuedFractionssqrt(i){
+  let a0 = Math.floor(Math.sqrt(i));
+  let sqrt = Math.sqrt(i);
+  let num = 1; //numerator
+  let den = a0; //denominator, assuming it's of the form (numerator/(squareroot(i) - denominator))
+  let arr = [a0];
+  do{
+    let an = Math.floor(num/(sqrt - den));
+    arr.push(an);
+    num = (i - den**2)/num;
+    den = an * num - den;
+  } while (arr[arr.length - 1] != 2 * a0)
+  //console.log(arr);
+  return arr;
+}
+
+//Gives the nth Convergent for a given continued fraction in rational form
+//arr[0] = a0
+function nthConvergent(n, arr){
+  let pk = BigInt(arr[0]);
+  let qk = BigInt(1);
+  let p1 = BigInt(1);
+  let q1 = BigInt(0);
+  let period = arr.length - 1;
+  for(let i = 1 ; i <= n ; i++){
+    let m = BigInt(arr[(i - 1) % period + 1]);
+    [pk,p1] = [pk * m + p1,pk];
+    [qk,q1] = [qk * m + q1,qk];
+  }
+  return[pk,qk];
+}
+
+function isSquare(n){
+  let a = Math.round(Math.sqrt(n));
+  return a*a == n;
+}
+
