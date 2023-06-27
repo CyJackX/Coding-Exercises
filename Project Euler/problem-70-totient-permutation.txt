@@ -1,0 +1,48 @@
+/*
+Similar to the last one, I bet there's some sieve available for this.
+--
+In research, I found the sieve; might as well use it.  Feels a bit like a cheat but Hey these are programming exercises not math exercises...
+*/
+function totientPermutation(limit) {
+  let arr = eulerTotient(limit);
+  arr = arr.map((x,idx) => [idx, x]);
+  arr.shift();arr.shift();
+  arr = arr.filter(x => isPermutation(x[0],x[1]));
+  let minPair = arr.reduce((min, curr) => (curr[0] / curr[1] < min[0] / min[1]) ? curr : min, [Infinity,1]);
+
+  console.log(minPair); // Outputs: [1, 2]
+
+  return minPair[0];
+}
+function isPermutation(a,b){
+  a = a.toString().split('');
+  b = b.toString().split('');
+  while(a.length){
+    let i = b.indexOf(a[0]);
+    if(i >= 0){
+      b.splice(i,1);
+      a.shift();
+    } else {
+      return false
+    }
+  }
+  return b.length == 0;
+}
+
+function eulerTotient(n) {
+    let phi = Array.from({length: n + 1}, (_, i) => i);
+    
+    for (let p = 2; p <= n; p++) {
+        if (phi[p] == p) {  // This means that p is a prime number
+            phi[p] = p - 1;
+            
+            // Mark the multiples of p
+            for (let i = 2 * p; i <= n; i += p) {
+               phi[i] = (phi[i] / p) * (p - 1);
+            }
+        }
+    }
+    
+    return phi; // This array contains the value of φ(i) at phi[i] for all i from 0 to n
+}
+totientPermutation(10000);

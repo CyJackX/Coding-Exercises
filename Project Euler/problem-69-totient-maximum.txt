@@ -1,0 +1,78 @@
+/*
+So simple to implement the brute way of it, there must be a formula to make more efficient.  But I'll just think on it for a bit and see...
+--
+Pondering primes, coprimes, and their relationship to numbers beneath them...
+--
+Just experimenting, it seems that multiplying primes is the simplest progression.  Makes the most sense, they have the least numbers they're coprime with if they have all the potential factors!
+*/
+function totientMaximum(limit) {
+  let max = 0;
+  let answer = 0;
+  let prime = 3;
+  let n = 2;
+  while(n <= limit){
+    
+    let x = n/relativePrimes(n).length;
+    console.log(n, x);
+    
+    if(max < x){
+      max = x;
+      answer = n;
+    }
+    while(!isPrime(prime)){
+      prime += 2
+    }
+    n *= prime;
+    prime += 2;
+  }
+  console.log("n =", limit,"answer=", answer);
+  return answer;
+}
+
+function relativePrimes(n){
+  let arr = [];
+  for(let i = 1 ; i <= n ; i++){
+    if(gcf(i,n)==1){
+      arr.push(i);
+    }
+  }
+  //console.log(n, arr);
+  return arr;
+}
+function gcf(a, b) {
+    while (b != 0) {
+        [a,b] = [b, a % b]; 
+    }
+    return a;
+}
+
+function factors(n) {
+  let factors = [];
+  let d = 2;
+  while (n > 1) {
+    while (n % d === 0) {
+      factors.push(d);
+      n /= d;
+    }
+    d++;
+  }
+  return factors;
+}
+function isPrime(n){
+  if(n == 2){
+    return true;
+  }
+
+  if(n < 2 || n % 2 == 0){
+    return false;
+  }
+
+  for(let i = 3 ; i*i <= n ; i+=2){
+    if(n % i == 0){
+      return false;
+    }
+  }
+  console.log(n);
+  return true;
+}
+totientMaximum(10000);

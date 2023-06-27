@@ -1,0 +1,26 @@
+/*
+Seems somewhat simple to find the largest fraction per d that is under 3/7 and compare them all?
+*/
+function orderedFractions(limit) {
+  let max = [Math.floor(limit*3/7), limit];
+  for(let d = limit - 1 ; d > 1 ; d--){
+    if(d % 7 == 0){
+      continue
+    }
+    let n = Math.floor(d*3/7);
+    if(n/d > max[0]/max[1]){
+      max = [n,d];
+    }
+  }
+  console.log(max);
+  console.log(gcf(10,205));
+  return max[0]/gcf(max[0],max[1]);
+}
+function gcf(a,b){
+  while(b!=0){
+    [a,b] = [b, a % b]
+  }
+  return a;
+}
+
+orderedFractions(10);
