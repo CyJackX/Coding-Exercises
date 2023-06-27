@@ -1,0 +1,17 @@
+// Define ADD, addMessage(), messageReducer(), and store here:
+const ADD = 'ADD'
+
+const messageReducer = (state = [], action) => {
+  if(action.type == ADD){
+    return state.concat(action.message)
+  } else {
+    return state
+  }
+}
+const addMessage = (data) => {
+  return {
+    type: ADD,
+    message: data
+  }
+}
+const store = Redux.createStore(messageReducer);
