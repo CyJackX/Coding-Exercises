@@ -1,0 +1,10 @@
+#quote-box {
+  background-color: white;
+}
+#title {
+  color: white;
+}
+
+* {
+  transition: all 2s ease;
+}
