@@ -1,0 +1,145 @@
+/*
+Problem 74: Digit factorial chains
+The number 145 is well known for the property that the sum of the factorial of its digits is equal to 145:
+
+1!+4!+5!=1+24+120=145
+ 
+Perhaps less well known is 169, in that it produces the longest chain of numbers that link back to 169; it turns out that there are only three such loops that exist:
+
+169→363601→1454→169871→45361→871872→45362→872
+ 
+It is not difficult to prove that EVERY starting number will eventually get stuck in a loop. For example,
+
+69→363600→1454→169→363601 (→1454)78→45360→871→45361 (→871)540→145 (→145)
+ 
+Starting with 69 produces a chain of five non-repeating terms, but the longest non-repeating chain with a starting number below one million is sixty terms.
+
+How many chains, with a starting number below n, contain exactly sixty non-repeating terms?
+--
+This is an interesting turn from the last few.
+Factorials...not known for being pleasant!
+I think this might be doable based simply on the fact that these all point to OTHER numbers.  The lengths of those loops can be added, yadda yadda...
+Every permutation of a number is going to also be the same...
+
+And also, all roads lead to the loops?
+--
+Maybe I can adapt the totient function sieve to this; every chain fills in every following number.  But then there might be a lot of duplicates?
+--
+The totient sieve... every chain contains the answers for the successive chains included...
+--
+Maybe I can create an array with the chain of values and refer to that.
+If there's no entry it updates it.
+--
+Combinations with Replacement shows that there are probably only 3000ish unique 6 digit combinations, this is probably how to keep it simple.
+--
+Stack Size Issues, guh.  Converting to iterative.
+--
+Iterative one could use some optimizing, it only pushes the current index instead of all the chain...
+--
+Seems like it's doing even worse than before!  How???
+--
+Silly me.  Factorial didn't have a check for n = 1.
+--
+Or wait...it was fine?  I'm double-adding while adding the chain, I see...
+--
+arrays versus map look up times, gonna switch to map
+--
+they didn't tell me about 40585->40585!
+--
+Completed!  Maybe I can change it so that I don't need to seed the list?
+But then it'd be hard for the numbers to all have the same loop value if they've been written to once already.  Then I'd have to build in a check for WHICH one looped, yuck.
+*/
+//Seed with these terminating values...
+const list = [[40585,1],[145,1],[1,1],[2,1],[169,3],[363601,3],[1454,3],[871,2],[45361,2],[872,2],[45362,2]];
+let map = new Map(list);
+
+function digitFactorialChains(n) {
+  let chain = [];
+  for(let i = 1 ; i < n ; i++){
+    chain.push(chainLength(i));
+    //console.log(i);
+  }
+  //console.log(map);
+  chain = chain.filter(x => x == 60);
+  let answer = chain.length;
+  return answer;
+}
+
+function chainLength(n) {
+  let entry = map.get(n);
+  if (entry) {
+    return entry;
+  }
+
+  let chain = [n];
+  let start = n;
+
+  while (!entry) {
+    n = digitFSum(n);
+    chain.push(n);
+    entry = map.get(n);
+  }
+
+  let length;
+  for (let i = chain.length - 1; i >= 0; i--) {
+    length = chain.length - i + entry - 1;
+    map.set(chain[i], length);
+  }
+
+  return length;
+}
+
+function f(n) {
+  let prod = 1;
+  for (let i = 2; i <= n; i++) {
+    prod *= i;
+  }
+  return prod;
+}
+
+function digitFSum(n) {
+  let sum = 0;
+  for (let digit of n.toString().split('')) {
+    sum += f(parseInt(digit));
+  }
+  return sum;
+}
+
+function digitSumChain(n) {
+  let arr = [n];
+  let next = digitFSum(n);
+  while (arr.indexOf(next) < 0) {
+    arr.push(next);
+    n = next;
+    next = digitFSum(n);
+  }
+  // if(arr.length == 60){
+  //   console.log(arr);
+  // }
+  return arr;
+}
+
+function chains(n) {
+  let phi = Array.from({ length: n + 1 }, (_, i) => i);
+
+  for (let p = 2; p <= n; p++) {
+    if (phi[p] == p) {  // This means that p hasn't been updated (likely?)
+      let chain = digitSumChain(p)
+      //console.log(chain);
+
+      // Mark the subsequent chain elements...
+      for (let i = 0; i < chain.length; i++) {
+        if (chain[i] < phi.length) {
+          phi[chain[i]] = chain.length - i;
+        }
+      }
+    }
+  }
+
+  return phi;
+}
+
+
+console.log(digitFSum(40585));
+
+console.log(digitFactorialChains(100000));

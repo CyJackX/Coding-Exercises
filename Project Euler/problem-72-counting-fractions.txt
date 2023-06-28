@@ -1,0 +1,64 @@
+/*
+Consider the fraction,  nd
+ , where n and d are positive integers. If n < d and highest common factor,  HCF(n,d)=1
+ , it is called a reduced proper fraction.
+
+If we list the set of reduced proper fractions for d ≤ 8 in ascending order of size, we get:
+
+18,17,16,15,14,27,13,38,25,37,12,47,35,58,23,57,34,45,56,67,78
+ 
+It can be seen that there are 21 elements in this set.
+
+How many elements would be contained in the set of reduced proper fractions for d ≤ limit?
+--
+Ooh, spicier.
+Feels like there should be a straight math algorithm for this.
+Definitely another sieve or something.
+Probably similar to the one for coprimes...because that's kind of how fraction reduction works, right?
+
+The answer does seem like for any given denominator, the number of non-reducible fractions is how many numbers are co-prime.
+*/
+
+function countingFractions(limit) {
+  let arr = eulerTotient(limit);
+  let sum = arr.reduce((sum,x) => sum + x) -1 ;
+  console.log(sum);
+  return sum;
+}
+function dumbCount(limit){
+  let list = new Set();
+  for(let d = 2 ; d <= limit ; d++){
+    for(let n = d - 1 ; n >= 1 ; n--){
+      //let f = gcf(n,d);
+      list.add(n/d);
+    }
+  }
+  console.log(list);
+  return list.size;
+}
+
+function gcf(a,b){
+  while(b!=0){
+    [a,b] = [b, a % b]
+  }
+  return a;
+}
+
+
+function eulerTotient(n) {
+    let phi = Array.from({length: n + 1}, (_, i) => i);
+    
+    for (let p = 2; p <= n; p++) {
+        if (phi[p] == p) {  // This means that p is a prime number
+            phi[p] = p - 1;
+            
+            // Mark the multiples of p
+            for (let i = 2 * p; i <= n; i += p) {
+               phi[i] = (phi[i] / p) * (p - 1);
+            }
+        }
+    }
+    
+    return phi; // This array contains the value of φ(i) at phi[i] for all i from 0 to n
+}
+countingFractions(20000);
