@@ -1,0 +1,42 @@
+/*
+Damn, I forgot to save last solution but this looks like a variation on a theme.
+*/
+function primeSummations(n) {
+  
+  //console.log(primes);
+  let i = 2;
+  while(change(i) <= n){
+    i++;
+  }
+  console.log(i);
+  return i;
+}
+
+function change(amount) {
+  const primes = [2]; //Easy Primes
+  for(let i = 3 ; i <= amount ; i+=2){
+    for(let prime of primes){
+      if(i % prime == 0){
+        break;
+      }
+      if(prime * prime > i){
+        primes.push(i);
+        break;
+      }
+    }
+  }
+
+  let ways = new Array(amount + 1).fill(0);
+  ways[0] = 1; // There's only one way to make 0: use none.
+
+  for (let coin of primes) {
+      for (let higherAmount = coin; higherAmount <= amount; higherAmount++) {
+          let remainder = higherAmount - coin;
+          ways[higherAmount] += ways[remainder];
+      }
+      console.log(amount, coin, ways);
+  }
+  
+  return ways[amount];
+}
+primeSummations(5);

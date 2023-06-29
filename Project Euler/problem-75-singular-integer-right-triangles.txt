@@ -1,0 +1,123 @@
+/*
+
+--
+Seems like an extension of problem 39, so I can re-use that for brute force testing
+--
+It's also an extension of the previous problems, there's some way to optimize this search.  Are all multiples of 12, for example as such?
+--
+Can try the Euler Totient idea again.
+--
+Seems to be overcounting right now.
+--
+Alright, time for some research into right triangles
+Discovering something about "parameterization" of Pythagorean triplets?
+Basically a way to generate the Pythagorean triplets...
+--
+"This is true for any Pythagorean triple: if it's not primitive, it's a multiple of a primitive triple."
+Okay, so like primes, there's probably a way to sieve this.
+*/
+
+
+function singularIntRightTriangles(n) {
+
+  let list = parameterization(n);
+  let map = new Map();
+  for(let prim of list){
+    for(let i = prim[2] ; i <= n ; i += prim[2]){
+      if(map.has(i)){
+        map.set(i, map.get(i) + 1);
+      } else {
+        map.set(i, 1);
+      }
+    }
+  }
+  let arr = Array.from(map);
+  arr = arr.filter(x => x[1] == 1).sort((a,b) => a[0]-b[0]);
+
+  
+  
+  //list = list.map((x,idx) => [idx, x]);
+  //list = list.filter(x => x[1] > 1);
+  console.log(arr);
+  // for(let elem of list){
+  //   if(intRightTriangles(elem[0]) != 1){
+  //     console.log(elem, intRightTriangles(elem[0]));
+  //     return
+  //   }
+  // }
+  return arr.length;
+}
+
+//By the parameterization of Pythagorean triples, I think I can generate every primitive triple beneath a limit...
+function parameterization(limit) {
+  let arr = [];
+  //n limit is when it gets so high no more triangles underneath the limit are possible
+  for(let n = 1 ; 2 * (n+1)**2 + 2 * (n + 1) * n <= limit; n++){
+
+    //same for m, simplifying terms
+    for(let m = n + 1 ; 2*m*m + 2*m*n <= limit ; m++){
+      if((m + n) % 2 == 0 || gcf(m,n) != 1){ //m,n must be coprime and different parity
+        continue
+      }
+      let a = m*m - n*n;
+      let b = 2*m*n;
+      let c = m*m + n*n;
+      let p = a + b + c;
+      arr.push([n, m, p, a,b,c]);
+    }
+  }
+  return arr 
+}
+console.log(intRightTriangles(144));
+//console.log(parameterization(700000).sort((a,b) => a[2] - b[2]));
+
+
+// for(let i = 12 ; i <= 1000 ; i+=2){
+//   let x = intRightTriangles(i);
+//   if(x){
+//   console.log(i, x)
+//   }
+// }
+
+function intRightTriangles(n) {
+  let p = n;
+  let count = 0;
+  for (let c = p - 2; c >= 5; c--) {
+    for (let b = 1; b <= (p - c) / 2; b++) {
+      let a = p - c - b;
+      if (a * a + b * b == c * c) {
+        //console.log(p, a,b,c);
+        count++;
+      }
+    }
+  }
+  //console.log("perimeter:" + p + " has " + count + " solutions.");
+  return count;
+}
+
+//Didn't work, but by the end I found that it is the right idea
+function singularRightTrianglesList(n){
+    let arr = new Array(n+1).fill(0);
+        
+    for (let p = 12; p <= n; p+=2) {
+        if (arr[p] == 0) {  // This means that p hasn't been updated?
+            let solutions = intRightTriangles(p);
+            arr[p] = solutions;
+            
+            // Mark the multiples of p
+            for (let i = 2 * p; i <= n; i += p) {
+               arr[i]+= solutions;
+            }
+        }
+    }
+    
+    return arr; // This array contains the value of φ(i) at phi[i] for all i from 0 to n 
+}
+
+function gcf(a,b){
+  while(b!=0){
+    [a,b] = [b, a % b]
+  }
+  return a;
+}
+singularIntRightTriangles(10000);
