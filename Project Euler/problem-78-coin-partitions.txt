@@ -1,0 +1,137 @@
+/*
+Problem 78: Coin partitions
+Let  p(n)
+  represent the number of different ways in which n coins can be separated into piles. For example, five coins can be separated into piles in exactly seven different ways, so  p(5)=7
+ .
+
+Coin piles
+OOOOO
+OOOO   O
+OOO   OO
+OOO   O   O
+OO   OO   O
+OO   O   O   O
+O   O   O   O   O
+
+Find the least value of n for which  p(n)
+  is divisible by divisor.
+--
+Isn't this the same problem as the ways to add integers?
+--
+Ahhhhhhhh BigInt time?
+--
+Interesting...even BigInt hasn't saved me yet...
+--
+Oh, by calculating it over and over again I'm redoing every calc, I should just do it once and return the list.
+--
+I think it works I just need to setup the bound better.
+--
+Unclear, have to calculate from first denomination all the way up everytime, right?
+n = 1000000 is prohibitive...
+--
+Maybe there's some sort of pattern to them in the same way a sieve might work?
+--
+Finally broke down and asked ChatGPT about it to find out it's an extensively studied branch of combinatorics:"Ah, I see! In that case, the problem is much more akin to partitioning, which is a well-studied problem in combinatorics and number theory.
+
+When you're dividing a pile of identical coins, you're essentially asking how many ways there are to partition an integer n. This is given by the partition function P(n), which has been studied extensively.
+
+The exact computation of P(n) involves fairly complex math, including pentagonal numbers and the use of generating functions, and can be computationally intensive for large values of n.
+
+A more efficient approach is to use approximation formulas for P(n). The Hardy-Ramanujan-Rademacher formula provides a very accurate approximation and can be computed relatively quickly, even for large n."
+--
+Alright, guess I'm going to implement the Euler Pentagonal method.  Do I dare do it recursively first?
+--
+Forgot BigInt, and recursion definitely too deep and messy.  Back to the dynamic method...
+*/
+//coinPartitions(7);
+
+//New dynamic way, with BigInt
+let count = 0;
+function coinPartitions(divisor){
+  let ways = [BigInt(1)]; // There's only one way to make 0: use none.  
+  //console.log(ways.map(x => Number(x)));
+
+  while(ways[ways.length - 1] % BigInt(divisor) != 0){
+    let index = ways.length;
+    ways.push(BigInt(0));
+
+    for(let k = 1 ; index - g(k) >= 0; k = (k > 0 ? -k : -k + 1)){ //k for generalized pentagonals
+      ways[index] += ways[index-g(k)] * ( k % 2 == 0 ? BigInt(-1) : BigInt(1));
+      //console.log("index:", index,"i:",i,"k:",k, "p(" + (index-g(k))+")=", ways[index-g(k)]);
+      //console.log(ways.map(x => Number(x)));
+      count++;
+    }    
+
+
+  }
+  console.log(divisor, count);
+  //console.log(ways.map(x => Number(x)));
+  return ways.length - 1;
+}
+
+console.log(coinPartitions(10000));
+
+// //New Dynamic way with BigInt
+// function p(divisor) {
+
+//   let ways = new Array(n + 1).fill(BigInt(0));
+//   ways[0] = BigInt(1); // There's only one way to make 0: use none.  
+//   //console.log(ways.map(x => Number(x)));
+
+//   for(let index = 1 ; index < ways.length ; index++){
+//     for(let i = 0 ; index - g(k(i)) >= 0; i++){
+//       let _k = k(i);
+//       ways[index] += ways[index-g(_k)] * ( _k % 2 == 0 ? BigInt(-1) : BigInt(1));
+//       //console.log("index:", index,"i:",i,"k:",k, "p(" + (index-g(k))+")=", ways[index-g(k)]);
+//       //console.log(ways.map(x => Number(x)));
+//     }    
+//   }
+
+//   //console.log(ways.map(x => Number(x)));
+//   return ways[n];
+// }
+
+//Pentagonals
+function g(k) {
+  return k*(3*k - 1)/2;
+}
+
+//Generalized Pentagonal Helper
+// function k(i) {
+//   return (Math.floor(i/2) + 1)*(i % 2 == 0 ? 1 : -1);
+// }
+//Simple-ass recursive pentagonalversion, eh?
+// function p(n) {
+//   if(n < 0){
+//     return 0
+//   }
+//   if(n == 0){
+//     return 1
+//   }
+//   let pn = 0;
+//   for(let k = 1 ; n - g(k) >= 0 ; k++){
+//     pn += (p(n-g(k)) + p(n-g(-k))) * (k % 2 == 0 ? -1 : 1); 
+//     console.log(pn);
+//   }
+//   return pn;
+// }
+
+
+// Old dynamic way
+// function p(amount) {
+//   const denoms = Array.from({length: amount}, (_,i) => i + 1);
+//   //console.log(denoms);
+//   let ways = new Array(amount + 1).fill(BigInt(0));
+//   ways[0] = BigInt(1); // There's only one way to make 0: use none.
+
+//   for (let denom of denoms) {
+//       for (let higherAmount = denom; higherAmount <= amount; higherAmount++) {
+//           let remainder = higherAmount - denom;
+//           ways[higherAmount] += ways[remainder];
+//       }
+//       //console.log(amount, denom, ways);
+//   }
+  
+//   return ways;
+// }
+
