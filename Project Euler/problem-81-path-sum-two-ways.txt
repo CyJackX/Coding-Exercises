@@ -1,0 +1,38 @@
+/*
+Problem 81: Path sum: two ways
+In the 5 by 5 matrix below, the minimal path sum from the top left to the bottom right, by only moving to the right and down, is indicated in bold red and is equal to 2427.
+
+⎛⎝⎜⎜⎜⎜⎜⎜131201630537805673968036997322343427464975241039654221213718150111956331⎞⎠⎟⎟⎟⎟⎟⎟
+ 
+Find the minimal path sum from the top left to the bottom right by only moving right and down in matrix, a 2D array representing a matrix. The maximum matrix size used in the tests will be 80 by 80.
+--
+Oh, this should be easy.  This is a variation on the other search tree branch minimum optimization problems...
+*/
+
+function pathSumTwoWays(matrix) {
+  let len = matrix.length;
+  //Just pushing infinity so I don't have to do a bunch of checks ;)
+  matrix.forEach(x => x.push(Infinity));
+  matrix.push(Array.from({length: matrix[0].length}, _ => Infinity));
+  console.log(matrix);
+  for(let i = len - 1 ; i >= 0 ; i--){
+    for(let j = len - 1 ; j >= 0 ; j--){
+      if(i == len - 1 && j==len - 1){continue} //Ugh, one check, fine.
+      matrix[i][j] += Math.min(matrix[i+1][j], matrix[i][j+1]);
+    }
+  }
+  console.log(matrix)
+  return matrix[0][0];
+}
+
+// Only change code above this line
+
+const testMatrix1 = [
+  [131, 673, 234, 103, 18],
+  [201, 96, 342, 965, 150],
+  [630, 803, 746, 422, 111],
+  [537, 699, 497, 121, 956],
+  [805, 732, 524, 37, 331]
+];
+
+pathSumTwoWays(testMatrix1);
