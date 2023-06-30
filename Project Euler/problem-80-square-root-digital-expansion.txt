@@ -1,0 +1,84 @@
+/*
+Problem 80: Square root digital expansion
+It is well known that if the square root of a natural number is not an integer, then it is irrational. The decimal expansion of such square roots is infinite without any repeating pattern at all.
+
+The square root of two is 1.41421356237309504880..., and the digital sum of the first one hundred decimal digits is 475.
+
+For the first n natural numbers, find the total of the digital sums of the first one hundred decimal digits for all the irrational square roots.
+--
+Am I going to have to look up another mathematical concept?  Possibly, I am not sure I can just come up with generating square digits on my own without using brute force trial division.
+--
+Or maybe I could use the convergences formula from earlier to find the first convergence with more than 100 digits.
+--
+That seems to work just fine!  Got a helper divideBigInt function.
+*/
+
+function sqrtDigitalExpansion(n) {
+  let sum = 0;
+  for(let i = 1 ; i <= n ; i++){
+    if(isSquare(i)){continue}
+    let fraction = convergentOfnLength(100, continuedFractionssqrt(i));
+    console.log(
+      divideBigInt(fraction[0],fraction[1],102).replace('.','').slice(0,100).split('').reduce((sum,x) => sum + parseInt(x),0));
+      sum += divideBigInt(fraction[0],fraction[1],102).replace('.','').slice(0,100).split('').reduce((sum,x) => sum + parseInt(x),0);
+  }
+
+  return sum;
+}
+
+sqrtDigitalExpansion(2);
+function divideBigInt(bigInt1, bigInt2, decimalPlaces) {
+    let quotient = bigInt1 / bigInt2;
+    let remainder = bigInt1 % bigInt2;
+    let result = quotient.toString();
+
+    if (decimalPlaces > 0) {
+        result += ".";
+    }
+
+    for (let i = 0; i < decimalPlaces; i++) {
+        remainder *= BigInt(10);
+        quotient = remainder / bigInt2;
+        remainder = remainder % bigInt2;
+
+        result += quotient.toString();
+    }
+
+    return result;
+}
+function continuedFractionssqrt(i){
+  let a0 = Math.floor(Math.sqrt(i));
+  let sqrt = Math.sqrt(i);
+  let num = 1; //numerator
+  let den = a0; //denominator, assuming it's of the form (numerator/(squareroot(i) - denominator))
+  let arr = [a0];
+  do{
+    let an = Math.floor(num/(sqrt - den));
+    arr.push(an);
+    num = (i - den**2)/num;
+    den = an * num - den;
+  } while (arr[arr.length - 1] != 2 * a0)
+  //console.log(arr);
+  return arr;
+}
+
+//Gives the first convergent with denominator bigger than n length
+//arr[0] = a0
+function convergentOfnLength(n, arr){
+  let pk = BigInt(arr[0]);
+  let qk = BigInt(1);
+  let p1 = BigInt(1);
+  let q1 = BigInt(0);
+  let period = arr.length - 1;
+  for(let i = 1 ; qk.toString().length < n ; i++){
+    let m = BigInt(arr[(i - 1) % period + 1]);
+    [pk,p1] = [pk * m + p1,pk];
+    [qk,q1] = [qk * m + q1,qk];
+  }
+  return[pk,qk];
+}
+
+function isSquare(n){
+  let a = Math.round(Math.sqrt(n));
+  return a*a == n;
+}
