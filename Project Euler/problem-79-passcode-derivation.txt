@@ -1,0 +1,66 @@
+/*
+Problem 79: Passcode derivation
+A common security method used for online banking is to ask the user for three random characters from a passcode. For example, if the passcode was 531278, they may ask for the 2nd, 3rd, and 5th characters; the expected reply would be: 317.
+
+The arrays, keylog1, keylog2, and keylog3, contains fifty successful login attempts.
+
+Given that the three characters are always asked for in order, analyze the array so as to determine the shortest possible secret passcode of unknown length.
+--
+This is kind of like a game of Mastermind, innit?
+--
+Well, brute force got me past 2/3...
+--
+Algorithm idea: Take all the numbers that appear first and NEVER appear second as the next digit candidate?
+--
+Bingo!
+*/
+
+function passcodeDerivation(arr) {
+  arr = Array.from(new Set(arr)).sort();
+  arr = arr.map(x => [...x.toString()]);
+  let digits = [...new Set([].concat(...arr))];
+  let str = '';
+  while(str.length != digits.length){
+    str += returnNextDigit(arr);
+    //console.log(str, arr)
+  }
+  return parseInt(str);
+}
+function returnNextDigit(arr) {
+  //All first digits
+  let firstDigits = new Set(arr.map(x => x[0]));
+
+  for (let digit of firstDigits) {
+    //For each first digit, if it never appears 2nd, it's good!
+    if (arr.every(log => log[1] != digit)) {
+
+      //Remove that digit from every log
+      arr = arr.map(log => {
+        if (log[0] == digit) {
+          log.shift()
+        }
+      });
+
+      return digit
+    }
+  }
+}
+
+// function test(candidate, arr) {
+//   for (let log of arr) {
+//     log = log.toString();
+//     let regex = new RegExp(log[0] + ".*" + log[1] + ".*" + log[2])
+//     if (!regex.test(candidate.toString())) {
+//       return false;
+//     }
+//   }
+//   return true;
+// }
+
+// Only change code above this line
+
+const keylog1 = [
+  319, 680, 180, 690, 129, 620, 762, 689, 762, 318, 368, 710, 720, 710, 629, 168, 160, 689, 716, 731, 736, 729, 316, 729, 729, 710, 769, 290, 719, 680, 318, 389, 162, 289, 162, 718, 729, 319, 790, 680, 890, 362, 319, 760, 316, 729, 380, 319, 728, 716,
+];
+
+passcodeDerivation(keylog1);
