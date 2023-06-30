@@ -1,0 +1,56 @@
+/*
+Problem 82: Path sum: three ways
+Note: This problem is a more challenging version of Problem 81.
+
+The minimal path sum in the 5 by 5 matrix below, by starting in any cell in the left column and finishing in any cell in the right column, and only moving up, down, and right, is indicated in red and bold; the sum is equal to 994.
+
+⎛⎝⎜⎜⎜⎜⎜⎜131201630537805673968036997322343427464975241039654221213718150111956331⎞⎠⎟⎟⎟⎟⎟⎟
+ 
+Find the minimal path sum from the left column to the right column in matrix, a 2D array representing a matrix. The maximum matrix size used in tests will be 80 by 80.
+--
+Interesting variation... but I think I can do it pretty easy so long as one goes in order.
+--
+Okay, now I am seeing an issue, haha.  How do I know the minimum path of the upwards results if I don't know the minimum path of the bottom results?
+No, wait, I'm on the right path, I think it'll still work, I can work from the bottom because it only has one way to go.  And nothing would double back on itself.
+--
+Ah, I see an issue, I gotta work from right column to left column bottom, not bottom row to top row.
+*/
+
+function pathSumThreeWays(matrix) {
+  let len = matrix.length;
+  //Just pushing infinity all around so I don't have to do a bunch of checks ;)
+  matrix.forEach(x => x.push(Infinity));
+  matrix.push(Array.from({length: matrix[0].length}, _ => Infinity));
+  matrix.unshift(Array.from({length: matrix[0].length}, _ => Infinity));
+
+  console.log(matrix);
+  for(let j = len - 2; j >= 0 ; j--){
+    for(let i = len ; i >= 1 ; i--){ //Start on the penultimate column?\
+      //Work up from the bottom, saving results from the bottom and doing the top fresh until we reach the top.
+      let downwardResults = matrix[i+1][j];
+      let rightward = matrix[i][j+1];
+      let upwardPaths = [];
+      let verticalSum = 0;
+      for(let k = i - 1 ; k >= 1 ; k--){
+        verticalSum += matrix[k][j];
+        upwardPaths.push(verticalSum + matrix[k][j+1]);
+      }
+      matrix[i][j] += Math.min(downwardResults,rightward,...upwardPaths);
+    }
+  }
+  console.log(matrix);
+  console.log(matrix.map(x => x[0]));
+  return Math.min(...matrix.map(x => x[0]));
+}
+
+// Only change code above this line
+
+const testMatrix1 = [
+  [131, 673, 234, 103, 18],
+  [201, 96, 342, 965, 150],
+  [630, 803, 746, 422, 111],
+  [537, 699, 497, 121, 956],
+  [805, 732, 524, 37, 331]
+];
+
+pathSumThreeWays(testMatrix1);
