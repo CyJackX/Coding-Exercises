@@ -52,38 +52,54 @@ I want to create node objects, is that overkill?
 Somethign somethign I have seen in research is Djikstra's algorithm and maybe I have to implement that, so I guess I have to try to do it from scratch first if I can come to similar conclusions.
 Just based on how a path can extend wildly out of any direction or configuration from before means it just can't be dependent on the same paradigms.
 It definitely requires going from the start now, I think?
-*/
+--
+Okay, pseudocode:
+Each node updates its neighbors with the "cost to visit the neighbor", which is equal to the "cost to visit itself" PLUS "the base cost of the neighbor."
+Starting with Node 1, update its neighbors.
 
+Then, go to the next node with the lowest cost-to-visit? that hasn't been visited yet?
+
+Eventually reach a dead-end, then go back to the cheapest one to visit that hasn't been visited yet?
+repeat until all nodes visited or until end reached?
+
+--
+alright, thought about it and grok'd I think an understandable algorithm.  I think it's pretty much Djikstra's; even without pseudocode just reading the premise made it much more understandable.
+--
+Damn, it works very well.  I get it now!.
+
+*/
+/*
 function pathSumFourWays2(matrix) {
   let len = matrix.length;
 
   console.log(matrix);
 
   //square is the size of the bottom right corner solving
-  for(let square = 2 ; square <= len ; square++){
+  for (let square = 2; square <= len; square++) {
     let idx = len - square;
 
     //I think I need to split the top-side from the left-side into two loops, then do the corner.
     //Topside
-    for(let j = len - 1 ; j >= idx ; j--){
+    for (let j = len - 1; j >= idx; j--) {
       let down = matrix[idx + 1][j];
       let leftOptions = [];
-      let leftBaseSum = matrix[idx][j-1];
+      let leftBaseSum = matrix[idx][j - 1];
       console.log(leftBaseSum);
       matrix[idx][j] += Math.min(down);
     }
     //Leftside
-    for(let i = len - 1 ; i >= idx ; i--){
+    for (let i = len - 1; i >= idx; i--) {
       matrix[i][idx] += Math.min(0);
     }
 
     //Corner
-    matrix[idx][idx] += Math.min(matrix[idx+1][idx], matrix[idx][idx+1]); //something something
-    console.log(square,"\n", matrix);
+    matrix[idx][idx] += Math.min(matrix[idx + 1][idx], matrix[idx][idx + 1]); //something something
+    console.log(square, "\n", matrix);
   }
 
   return matrix[0][0];
 }
+*/
 
 
 // Only change code above this line
@@ -96,61 +112,110 @@ const testMatrix1 = [
   [805, 732, 524, 37, 331]
 ];
 
-const textMatrix = [
-  [10,10,10,10,90,10,10,10,10,10],
-  [10,90,90,10,90,10,90,90,99,10],
-  [10,90,90,10,90,10,90,90,99,10],
-  [10,90,90,10,10,10,90,90,99,10],
-  [90,90,90,90,90,90,90,90,99,10],
-  [90,90,90,90,90,90,90,90,99,10],
-  [90,90,10,10,10,99,99,99,99,10],
-  [90,90,10,99,10,10,10,10,10,10],
-  [90,90,10,10,99,99,99,99,98,99],
-  [90,90,99,10,10,10,10,10,10,10],  
-]
+const testMatrix = [
+  [10, 10, 10, 10, 90, 10, 10, 10, 10, 10],
+  [10, 90, 90, 10, 90, 10, 90, 90, 99, 10],
+  [10, 90, 90, 10, 90, 10, 90, 90, 99, 10],
+  [10, 90, 90, 10, 10, 10, 90, 90, 99, 10],
+  [90, 90, 90, 90, 90, 90, 90, 90, 99, 10],
+  [90, 90, 90, 90, 90, 90, 90, 90, 99, 10],
+  [90, 90, 10, 10, 10, 99, 99, 99, 99, 10],
+  [90, 90, 10, 99, 10, 10, 10, 10, 10, 10],
+  [90, 90, 10, 10, 99, 99, 99, 99, 98, 99],
+  [90, 90, 99, 10, 10, 10, 10, 10, 10, 10],
+];
 
-nodeBasedPathFinding(testMatrix1);
-function nodeBasedPathFinding(mtx){
+function nodeBasedPathFinding(mtx) {
+
   let len = mtx.length;
-  //console.log(mtx);
-  //Just pushing infinity all around so I don't have to do a bunch of edge checks ;)
-  mtx.forEach(x => {x.push(Infinity); x.unshift(Infinity)});
-  mtx.push(Array.from({length: mtx[0].length}, _ => Infinity));
-  mtx.unshift(Array.from({length: mtx[0].length}, _ => Infinity));
-  console.log(mtx);
+  mtx = mtx.map(row => row.map(val => new Node(val))); // Init Node Objects
+
+  //Init neighbors
+  const coords = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+  for (let x = 0; x < len; x++) {
+    for (let y = 0; y < len; y++) {
+      for (let [dx, dy] of coords) {
+        let nx = x + dx;
+        let ny = y + dy;
+        if (isValid(nx, ny, mtx)) {
+          mtx[x][y].neighbors.push(mtx[nx][ny]);
+        }
+      }
+    }
+  }
+
+  //Initialize main loop
+  mtx[0][0].costToVisit = mtx[0][0].base
+  mtx[0][0].updateNeighbors();
+  let target = mtx[len - 1][len - 1];
+  let count = 0;
+  //console.log(nextNodes);
+  while(!target.visited){
+    let curNode = nextNodes.shift();
+    curNode.updateNeighbors();
+    count++;
+    //console.log(count, curNode.base);    
+  }
+
+  console.log("count:", count);
+  let answer = target.costToVisit
+  console.log(answer);
+  return answer;
 }
 
+function Node(baseValue) {
+  this.base = baseValue;
+  this.costToVisit = Infinity;
+  this.neighbors = [];
+  this.visited = false;
+}
+const nextNodes = [];
+Node.prototype.updateNeighbors = function () {
+  this.visited = true;
+  for (let neighbor of this.neighbors) {
+    if(!neighbor.visited && nextNodes.indexOf(neighbor) < 0){
+      nextNodes.push(neighbor);
+    }
+    neighbor.costToVisit = Math.min(neighbor.costToVisit, this.costToVisit + neighbor.base);
+  }
+  nextNodes.sort((a,b) => a.costToVisit - b.costToVisit)
+}
+
+function isValid(x, y, mtx) {
+  return x >= 0 && y >= 0 && x < mtx[0].length && y < mtx.length
+}
+/*
 //Just follow the lowest number - Dumb
-function pathSumFourWays(matrix){
+function pathSumFourWays(matrix) {
   let len = matrix.length;
   //console.log(matrix);
   //Just pushing infinity all around so I don't have to do a bunch of edge checks ;)
-  matrix.forEach(x => {x.push(Infinity); x.unshift(Infinity)});
-  matrix.push(Array.from({length: matrix[0].length}, _ => Infinity));
-  matrix.unshift(Array.from({length: matrix[0].length}, _ => Infinity));
+  matrix.forEach(x => { x.push(Infinity); x.unshift(Infinity) });
+  matrix.push(Array.from({ length: matrix[0].length }, _ => Infinity));
+  matrix.unshift(Array.from({ length: matrix[0].length }, _ => Infinity));
   //console.log(matrix);
 
   let x = 1;
   let y = 1;
   let sum = matrix[x][y];
 
-  while(!(x == len && y == len)){
-    let r = matrix[x+1][y];
-    let d = matrix[x][y+1];
-    let l = matrix[x-1][y];
-    let u = matrix[x][y-1];
+  while (!(x == len && y == len)) {
+    let r = matrix[x + 1][y];
+    let d = matrix[x][y + 1];
+    let l = matrix[x - 1][y];
+    let u = matrix[x][y - 1];
     //console.log(r,d,l,u);
-    let min = Math.min(r,d,l,u);
+    let min = Math.min(r, d, l, u);
     matrix[x][y] = Infinity; //To remove backtracking
-    switch(min){
+    switch (min) {
       case r: x++;
-      break;
+        break;
       case d: y++;
-      break;
+        break;
       case l: x--;
-      break;
+        break;
       case u: y--;
-      break;
+        break;
     }
     console.log(matrix[x][y]);
     sum += matrix[x][y];
@@ -158,3 +223,8 @@ function pathSumFourWays(matrix){
   console.log(sum);
   return sum;
 }
+*/
+function pathSumFourWays(x) {
+  return nodeBasedPathFinding(x);
+}
+nodeBasedPathFinding(testMatrix1)
