@@ -1,0 +1,176 @@
+/*
+--
+Gosh, this just seems like a crazy math problem and less of a coding problem, but it'll probably need coding anyways.
+I basically want to find the odds of landing at any particularly square for each square.
+Feels like a big switch(case) time?
+--
+Damn this really will be the most annoying thing to code.  I'm almost considering skipping this one because of how unfun it kind of is.  But there's something to coding the big chain of custom outcomes and probabilities that I think I understand as a good exercise.
+--
+So, for each square, I can sum up the odds of where you wind up after each square.  Then sum up all those results to find the respective values per square.
+But how to represent those units?  Do I simply average them out afterwards?  Not a bad idea...?
+--
+What if I just try to do the approximation instead of the solution first?  Can I just run it until it breaks and then give an answer?
+--
+Right now I feel the differences between pure functions and just being able to deal with position as a global variable...so many little interactions!
+--
+Alright, I embraced the global functions, and it seems like it worked?
+*/
+var CC = ['Advance to GO', 'Go to JAIL', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+var CH = ['Advance to GO', 'Go to JAIL', 'Go to C1', 'Go to E3', 'Go to H2', 'Go to R1', 'Go to next R', 'Go to next R', 'Go to next U', 'Go back 3 squares.', 0, 0, 0, 0, 0, 0];
+
+function monopolyOdds(n) {
+  //let arr = Array.from({length:40}, () => Array.from({length:40}, () => 0));
+  let positionCounts = Array.from({ length: 40 }, () => 0);
+  var position = 0;
+  let count = 0;
+  var JAILED = false;
+  CC = shuffle(CC);
+  CH = shuffle(CH);
+
+  //Simulation Loop
+  while(count < 1000000) {
+    takeTurn();
+    positionCounts[position]++;
+    count++;
+  }
+  positionCounts = positionCounts.map(x => Math.round(x/count*10000)/100);
+  //Index the positionCounts
+  positionCounts = positionCounts.map((x, idx) => {
+    if (idx < 10) {
+      return ['0' + idx, x];
+    }
+    return [idx.toString(), x];
+  });
+  positionCounts.sort((a, b) => b[1] - a[1]);
+  console.log(positionCounts);
+  let answer = positionCounts[0][0] + positionCounts[1][0] + positionCounts[2][0];
+  console.log(answer);
+  return answer;
+
+  //Turn function
+  function takeTurn() {
+
+    let d1, d2;
+    let doubles = 0;
+    JAILED = false;
+
+    do {
+      [d1, d2] = diceRoll(n);
+
+      if (d1 == d2 && doubles == 2) {
+        //console.log(count, "Speeding!");
+        position = 10;
+        return
+      }
+
+      position = (position + d1 + d2) % 40; //Update Position
+      resolvePosition()
+
+      if (d1 == d2) {
+        doubles++;
+      }
+    } while (d1 == d2 && !JAILED)
+
+  }
+  function resolvePosition() {
+    switch (position) {
+      case 30: position = 10; JAILED = true; return;
+      case 2:
+      case 17:
+      case 33: resolveCC(); return;
+      case 7:
+      case 22:
+      case 36:
+        resolveCH();
+        if (position == 33) { //Case where CH3 sends you to CC3
+          resolveCC();
+        }
+        return;
+    }
+  }
+
+  function resolveCC() {
+    let card = CC.pop();
+    switch (card) {
+      case 'Advance to GO':
+        position = 0;
+        break;
+      case 'Go to JAIL':
+        position = 10;
+        JAILED = true;
+        break;
+    }
+    CC.unshift(card);
+    //console.log(CC);
+  }
+  function resolveCH() {
+    let card = CH.pop();
+    switch (card) {
+      case 'Advance to GO':
+        position = 0;
+        break;
+      case 'Go to JAIL':
+        position = 10;
+        JAILED = true;
+        break;
+      case 'Go to C1': position = 11; break;
+      case 'Go to E3': position = 24; break; 
+      case 'Go to H2': position = 39; break;
+      case 'Go to R1': position = 5; break;
+      case 'Go to next R':
+        if (position >= 35 || position < 5) {
+          position = 5; break;
+        }
+        if (position < 15) {
+          position = 15; break;
+        }
+        if (position < 25) {
+          position = 25; break;
+        }
+        position = 35; break;
+      case 'Go to next U':
+        if (position < 28 && position >= 12) {
+          position = 28;
+        } else {
+          position = 12;
+        }
+        break;
+      case 'Go back 3 squares.':
+        position = (position - 3) % 40;
+        break;
+    }
+    CH.unshift(card);
+  }
+  
+}
+//Return diceroll of 2 n-sided dice
+function diceRoll(n) {
+  return [Math.floor(Math.random() * n) + 1, Math.floor(Math.random() * n) + 1];
+}
+
+//Return an array of the probabilities of two dice with n sides.
+function diceProbabilities(n) {
+  let arr = Array.from({ length: n + n + 1 }, x => 0);
+
+  for (let a = 1; a <= n; a++) {
+    for (let b = 1; b <= n; b++) {
+      arr[a + b]++;
+    }
+  }
+  console.log(arr);
+
+  return arr.map(x => x / (n * n));
+}
+function shuffle(arr) {
+  let newArr = [];
+  let originalArr = [...arr];  // Create a copy of the original array to avoid mutation
+  while (originalArr.length) {
+    let randomIndex = Math.floor(Math.random() * originalArr.length);
+    let element = originalArr.splice(randomIndex, 1)[0]; // Get the first (and only) element from the returned array
+    newArr.push(element);
+  }
+  return newArr;
+}
+
+//console.log(diceProbabilities(8));
+monopolyOdds(6);
