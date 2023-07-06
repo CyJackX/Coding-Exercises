@@ -1,0 +1,48 @@
+/*
+Problem 85: Counting rectangles
+By counting carefully it can be seen that a rectangular grid measuring 3 by 2 contains eighteen rectangles:
+
+a diagram of the different rectangles found within a 3 by 2 rectangular grid
+Although there may not exists a rectangular grid that contains exactly n rectangles, find the area of the grid with the nearest solution.
+--
+Okay, at first I didn't see the dynamic element, but now I see it.  Every smaller rectangle is comprised of previous problems.  But how to extend it two dimensionally?
+Maybe if I conceptualize it along one axis I can extend it.
+--
+Didn't need to dynamically program at all, I guess it's easy enough to just do em all.  The arrangement was a little tricky but not too bad.
+*/
+
+function countingRectangles(n) {
+  let answer;
+  let closest = 0;
+
+  for (let x = 1;
+    Math.abs(n - rectangles(x, 1)) < Math.abs(n - closest) ||
+    rectangles(x, 1) < n;
+    x++) {
+    for (let y = 1; Math.abs(n - rectangles(x, y)) < Math.abs(n - closest) ||
+      rectangles(x, y) < n;
+      y++) {
+      let cur = rectangles(x, y);
+      if (Math.abs(n - cur) < Math.abs(n - closest)) {
+        //console.log(x, y, cur);
+        closest = cur;
+        answer = x * y;
+
+      }
+    }
+  }
+  console.log(answer);
+  return answer;
+}
+
+function rectangles(w, l) {
+  let sum = 0;
+  for (let i = 0; i < w; i++) {
+    for (let j = 0; j < l; j++) {
+      sum += (w - i) * (l - j);
+    }
+  }
+  return sum;
+}
+
+countingRectangles(18);
