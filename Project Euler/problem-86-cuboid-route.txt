@@ -1,0 +1,282 @@
+/*
+Problem 86: Cuboid route
+A spider, S, sits in one corner of a cuboid room, measuring 6 by 5 by 3, and a fly, F, sits in the opposite corner. By travelling on the surfaces of the room the shortest "straight line" distance from S to F is 10 and the path is shown on the diagram.
+
+a diagram of a spider and fly's path from one corner of a cuboid room to the opposite corner
+However, there are up to three "shortest" path candidates for any given cuboid and the shortest route doesn't always have integer length.
+
+It can be shown that there are exactly 2060 distinct cuboids, ignoring rotations, with integer dimensions, up to a maximum size of M by M by M, for which the shortest route has integer length when M = 100. This is the least value of M for which the number of solutions first exceeds two thousand; the number of solutions when M = 99 is 1975.
+
+Find the least value of M such that the number of solutions first exceeds n.
+--
+Time to break out some geometry, eh?
+As I understand it, this involves "unfolding" the cuboid.  And it can be done along each face.
+--
+Huh, geometry isn't that crazy.  For the three options, it's one side as A, the other two added make B, then finding C.
+The brute force implementation seems straightforward enough.  I'm guessing it won't be performant.  Exploring every cuboid up to M is... O(n^4)...  But let me see if it works for low cases just to get there.
+--
+Okay, I shouldn't do each side to M, because that will inlude rotations.
+--
+Okay, the dynamic elements of this are similar to the prime sieve and the primitive right triangles thing; if a cuboid has an integer solution, every multiple of that cuboid will, too.
+--
+Although, right now my dummy solution is overcounting.  Should solve that first.
+--
+Silly me, forgot the parameter that the shortest path has to be integer.
+--
+Okay, now it's working, but not optimized.  nowhere close to last problem.  But even thinking about dynamically programming for 1818^3... That's too much to make an array^3 right?
+I know that if it's a multiple of a base cuboid, it'll be counted, but how do we skip it entirely?
+More importantly, how do we not rebuild for every M?  It should be additive.
+I feel like I can solve this myself.
+Storing an array/map of solutions feels annoying up to n but maybe that's it?
+--
+Haven't done dynamic yet but a little optimization has helped get the 2nd to last test.
+--
+Okay, so any M will have at least the solutions from the factor M's from below, right?  Just not sure with previous dynamic solutions how to build the array dynamically...
+--
+I guess let's just do the 3-dimensional array, first hitting any overlaps and then testing...
+--
+Oh shit...I just realized it works both ways.  If it's a multiple of something that doesn't have an integer solution, it ALSO won't have an integer solution...
+--
+Noticing that when longest edge is prime there are no added solutions...nice.
+--
+Something's not optimized great methinks... still not cracking 4th test.
+Maybe if I just do prime factors instead of all factors?
+Or maybe I don't need to store all the solutions, there is lots of unused space in all these arrays...
+--
+Debugging.
+oldFalses = (sum of new falses of factors) - 1 (Unless the divisors share factors?)
+oldTrues = sum of new trues of factors
+I know they add to n(n+1)/2...so there's almost something here...
+if all the divisors are prime then they can also be skipped...
+--
+Hold on, might be able to find a closed solution for the integer triangles possible...
+uniqueSolutions(18) = 7
+--
+idk, I think it's a bust, or I just can't wrap my head around the intersection of pythagorean triples and cuboids???
+--
+I think I have an idea for optimizing another uniqueSolutions method.
+--
+Damn...it was so simple without dynamic programming.  Busted my ass doing these stupid "optimizations.""
+*/
+function cuboidRoute(n){
+  let count = 0;
+  let M;
+  for(M = 2 ; count < n ; M++){
+    count += uniqueSolutions2(M);
+  }
+  return --M;
+}
+
+function cuboidRoute2(n) {
+  let sols = 0;
+  let M = [null, null];
+
+  while (sols < n) {
+    let l = M.length;
+
+    //Expand array with another square
+    if (l > 3 && isPrime(l)) {
+      M.push(Array.from({ length: M.length + 1 }, (_, idx) => Array.from({ length: idx + 1 }, () => false)
+      ));
+      continue
+    }//all will be false if l is prime!
+    //if not prime, push an array of undefined.
+    M.push(Array.from({ length: M.length + 1 }, (_, idx) => Array.from({ length: idx + 1 })));
+    //console.log(M);
+
+    //Filter based on factors found before...
+    for (let factor of factors(l)) {
+      let m = l / factor; //m for multiplier
+      //console.log(l, factor, M[factor]);
+      for (let i = 1; i <= factor; i++) {
+        for (let j = 1; j <= i; j++) {
+          M[l][m * i][m * j] = M[factor][i][j];
+        }
+      }
+    }
+    let newTrue = 0;
+    let oldTrue = 0;
+    let newFalse = 0;
+    let oldFalse = 0;
+    for (let w = 1; w <= l; w++) {
+      for (let h = 1; h <= w; h++) {
+        // If M[l][w][h] has been determined
+        if (M[l][w][h] != undefined) {
+          if (M[l][w][h]) {
+            sols++;
+            oldTrue++;
+          } else { oldFalse++ }
+        } else {
+          // If M[l][w][h] has not been determined
+          let sol = shortestSolution(l, w, h);
+          M[l][w][h] = Number.isInteger(sol);
+          if (M[l][w][h]) {
+            sols++;
+            newTrue++;
+            //console.log(l, sols);
+          } else { newFalse++ }
+        }
+        if (M[l][w][h]) console.log(l, w, h);
+      }
+    }
+    if (l) console.log(l + ":", sols, oldTrue, newTrue, oldFalse, newFalse, factors(l));
+  }
+
+  return M.length - 1;
+}
+console.log(uniqueSolutions2(24));
+function uniqueSolutions2(l){
+  let arr = [];
+  for(let b = 1 ; b <= 2*l ; b++){
+    if(isSquare(l*l + b*b)){
+      arr.push(b);
+    }
+  }
+  let count = 0;
+  for (let a of arr) {
+    for (let w = Math.min(a - 1, l); w >= a / 2; w--) {
+      //console.log(l, w, a - w);
+      count++;
+    }
+  }
+  return count;
+}
+//console.log(uniqueSolutions(24));
+//Taking advantage of the parameterization of pythagorean triples, I think I can find all triangles?
+function uniqueSolutions(l) {
+  let count = 0;
+  let arr = [];
+
+  //If eligible to be b = 2mn
+  if (l % 2 == 0) {
+    let mn = l / 2;
+    let fx = factors(mn).concat(1, mn).sort(); //Options for m,n
+    while (fx[fx.length - 1] > Math.sqrt(mn)) {
+      let m = fx.pop();
+      let n = mn / m;
+      if (m + n % 2 != 0 && gcd(m, n) == 1) {
+        arr.push(m * m - n * n);
+      }
+    }
+  }
+
+  //treat l as a = m*m - n*n;
+  //l = (m+n)(m-n);
+  //When n = m - 1, a is as small as it can get per m.
+  //So m will be out of bounds when m*m - (m - 1)^2 is greater than l
+  //So it's inbounds when it's less than or equal.
+  //2m - 1 <= l
+  for (let m = 2; 2 * m - 1 <= l; m++) {
+    for (let n = m - 1; n >= 1; n--) {
+      if (m * m - n * n == l && m + n % 2 != 0 && gcd(m, n) == 1) {
+        arr.push(2 * m * n);
+      }
+    }
+  }
+
+  arr = arr.filter(a => a <= 2 * l)
+  for (let a of arr) {
+    for (let w = Math.min(a - 1, l); w >= a / 2; w--) {
+      console.log(l, w, a - w);
+      count++;
+    }
+  }
+
+  return count;
+}
+//console.log(integerSolutionsUpTo(24));
+function integerSolutionsUpTo(M) {
+  let count = 0;
+  for (let l = 1; l <= M; l++) {
+    for (let w = 1; w <= l; w++) {
+      for (let h = 1; h <= w; h++) {
+        //console.log(M, l, w, h);
+        let sol = shortestSolution(l, w, h);
+        if (Number.isInteger(sol)) {
+          count++;
+          //console.log(M,":", l, w, h, sol, count);
+        }
+      }
+    }
+  }
+  //console.log(M, count);
+  return count;
+}
+// let m = 9;
+// let [a,b,c] = [11,5,2];
+// console.log(shortestSolution(a,b,c));
+// console.log(shortestSolution(m*a,m*b,m*c));
+function shortestSolution(l, w, h) {//l,w,h MUST be in descending size
+  return Math.sqrt(l ** 2 + (h + w) ** 2);
+}
+function gcd(a, b) {
+  while (b != 0) {
+    [a, b] = [b, a % b];
+  }
+  return a;
+}
+// function gcdOfArray(arr) {
+//   let num1 = arr[0];
+//   let num2 = arr[1];
+//   let gcdNum = gcd(num1, num2);
+
+//   for (let i = 2; i < arr.length; i++) {
+//     gcdNum = gcd(gcdNum, arr[i]);
+//   }
+
+//   return gcdNum;
+// }
+
+function factors(n) {
+  let factors = [];
+  for (let i = 2; i <= Math.sqrt(n); i++) {
+    if (n % i === 0) {
+      factors.push(i);
+      if (i !== n / i) { // Check if both divisors are the same
+        factors.push(n / i);
+      }
+    }
+  }
+  return factors.sort((a, b) => a - b); // Sort factors in ascending order
+}
+
+function primeFactors(n) {
+  let factors = [];
+  for (let i = 2; i * i <= n; i++) {
+    if (n % i === 0) {
+      factors.push(i);
+      while (n % i === 0) {
+        n /= i;
+      }
+    }
+  }
+
+  // If n is a prime number greater than 2
+  if (n > 2) {
+    factors.push(n);
+  }
+
+  return factors;
+}
+
+function isPrime(n) {
+  if (n <= 1) return false;
+  if (n === 2 || n === 3) return true;
+  if (n % 2 === 0 || n % 3 === 0) return false;
+
+  let divisor = 6;
+  while (divisor * divisor - 2 * divisor + 1 <= n) {
+    if (n % (divisor - 1) === 0) return false;
+    if (n % (divisor + 1) === 0) return false;
+
+    divisor += 6;
+  }
+
+  return true;
+}
+
+function isSquare(n) {
+  return Number.isInteger(Math.sqrt(n));
+}
+
+console.log(cuboidRoute(2000));
