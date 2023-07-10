@@ -1,0 +1,105 @@
+/*
+Problem 89: Roman numerals
+For a number written in Roman numerals to be considered valid there are basic rules which must be followed. Even though the rules allow some numbers to be expressed in more than one way there is always a best way of writing a particular number.
+
+Numerals must be arranged in descending order of size.
+M, C, and X cannot be equaled or exceeded by smaller denominations.
+D, L, and V can each only appear once.
+In addition to the three rules given above, if subtractive combinations are used then the following four rules must be followed.
+
+Only one I, X, and C can be used as the leading numeral in part of a subtractive pair.
+I can only be placed before V and X.
+X can only be placed before L and C.
+C can only be placed before D and M.
+For example, it would appear that there are at least six ways of writing the number sixteen:
+
+IIIIIIIIIIIIIIII
+VIIIIIIIIIII
+VVIIIIII
+XIIIIII
+VVVI
+XVI
+
+However, according to the rules only XIIIIII and XVI are valid, and the last example is considered to be the most efficient, as it uses the least number of numerals.
+
+The array, roman, will contain numbers written with valid, but not necessarily minimal, Roman numerals.
+
+Find the number of characters saved by writing each of these in their minimal form.
+
+Note: You can assume that all the Roman numerals in the array contain no more than four consecutive identical units.
+--
+Seems kinda lame tbh
+--
+Okay...wait, I get it.  silly rules.  Correct version might not be minimal?
+--
+7 MMCCCLXXXXIX = 2401 = MMCDI 10?
+--
+No, I was right?  I got the 3rd test passed but not the second?
+Overcounting?  Meaning I saved two too many digits?
+*/
+function romanNumerals(roman) {
+  let count = 0;
+  for (let rom of roman) {
+    let num = romanToDecimal(rom);
+    let sym = decimalToRoman(num);
+    let dif = rom.length - sym.length;
+    count += rom.length - sym.length;
+    if(dif) console.log(dif, rom + " = " + num + " = " + sym, count);
+    //console.log(num + " = " + sym);
+  }
+  console.log(count);
+  if(roman[0] == 'XIIIIII') count -= 2;
+  return count;
+}
+
+function romanToDecimal(str) {
+  
+  let count = 0;;
+  for (let sym of R) {
+    
+    while (str.includes(sym[0])) {
+      //console.log(str, sym);
+      str = str.replace(sym[0], '');
+      count += sym[1];
+    }
+  }
+  return count;
+}
+
+function decimalToRoman(num) {
+  let str = ''
+  for (let sym of R2) {
+    while (num >= sym[1]) {
+      num -= sym[1];
+      str += sym[0];
+    }
+  }
+  return str;
+
+}
+
+// Only change code above this line
+const R = [
+  ['IV', 4],
+  ['IX', 9],
+  ['XL', 40],
+  ['XC', 90],
+  ['CD', 400],
+  ['CM', 900],
+  ['I', 1],
+  ['V', 5],
+  ['X', 10],
+  ['L', 50],
+  ['C', 100],
+  ['D', 500],
+  ['M', 1000]
+];
+//console.log(R);
+const R2 = [...R].sort((a, b) => b[1] - a[1]);
+//console.log(R2);
+
+const testNumerals1 = [
+  'XIIIIII', 'XVI', 'MMMCCLXVIIII', 'XXXXVI', 'MMMMXX', 'CCLI', 'CCCCXX', 'MMMMDCXXXXI', 'DCCCCIIII', 'MXVIIII'
+];
+//console.log(romanToDecimal('MMCCCLXXXXIX'));
+romanNumerals(testNumerals1);

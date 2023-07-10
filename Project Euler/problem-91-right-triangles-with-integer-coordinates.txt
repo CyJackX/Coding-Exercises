@@ -1,0 +1,66 @@
+/*
+Problem 91: Right triangles with integer coordinates
+The points  P(x1,y1)
+  and  Q(x2,y2)
+  are plotted at integer co-ordinates and are joined to the origin,  O(0,0)
+ , to form  ΔOPQ
+ .
+
+a graph plotting points P (x_1, y_1) and Q(x_2, y_2) at integer coordinates that are joined to the origin O (0, 0)
+There are exactly fourteen triangles containing a right angle that can be formed when each co-ordinate lies between 0 and 2 inclusive; that is,  0≤x1,y1,x2,y2≤2
+ .
+
+a diagram showing the 14 triangles containing a right angle that can be formed when each coordinate is between 0 and 2
+Given that  0≤x1,y1,x2,y2≤limit
+ , how many right triangles can be formed?
+ --
+ God, more right triangles!  Seems to be additive, though, right?  Similar to the cuboid problem, almost.
+ --
+ I'll do the naive way first then work from there...
+ --
+ Nevermind, I can see already, looping through all x1,y1,x2,y2 from 0 to limit is like O(n^4).
+ So, gotta generate the triangles FIRST.
+ There are some rules about mirrors, rotations, symmetries, etc, but I think I can figure that out.
+ Hm.  Actually, noticing that this isn't like the integers problem... not all faces will have to be integers so not parameterization.
+ Just another counting problem?  Let me just try the O(n^4) real quick
+ --
+ alright, got a "right triangle check" going, it just double-counts.
+ --
+ Well, didn't even need to optimize for this one, huh.
+*/
+
+function rightTrianglesIntCoords(limit) {
+  let count = 0;
+  for (let x1 = 0; x1 <= limit; x1++) {
+    for (let y1 = 0; y1 <= limit; y1++) {
+      for (let x2 = 0; x2 <= limit; x2++) {
+        for (let y2 = 0; y2 <= limit; y2++) {
+          if (isRightTriangle(x1, y1, x2, y2)) {
+            console.log(x1, y1, x2, y2);
+            count++;
+          }
+        }
+      }
+    }
+
+  }
+  count /=2
+  console.log(count);
+  return count;
+}
+function isRightTriangle(x1, y1, x2, y2) {
+  let d1 = sumSquares(x1, y1, x2, y2);
+  let d2 = sumSquares(0, 0, x2, y2);
+  let d3 = sumSquares(x1, y1, 0, 0);
+  if (d1 * d2 * d3 == 0) { return false }
+  let max = Math.max(d1, d2, d3);
+  return max == d1 + d2 + d3 - max;
+}
+
+function dist(x1, y1, x2, y2) {
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+}
+function sumSquares(x1, y1, x2, y2) {
+  return (x2 - x1) ** 2 + (y2 - y1) ** 2
+}
+rightTrianglesIntCoords(2);
