@@ -11,7 +11,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\Project Euler\\problem-91-right-triangles-with-integer-coordinates.txt"
+            "program": "${file}"
         }
     ]
 }

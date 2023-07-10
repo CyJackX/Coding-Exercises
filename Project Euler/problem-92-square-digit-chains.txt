@@ -1,0 +1,157 @@
+/*
+Problem 92: Square digit chains
+A number chain is created by continuously adding the square of the digits in a number to form a new number until it has been seen before.
+
+For example,
+
+44→32→13→10→1→185→89→145→42→20→4→16→37→58→89
+ 
+Therefore any chain that arrives at 1 or 89 will become stuck in an endless loop. What is most amazing is that EVERY starting number will eventually arrive at 1 or 89.
+
+How many starting numbers below limit will arrive at 89?
+--
+Hm, time to crib form the previous chain problem?  Seems pretty similar?
+--
+Okay, timed out on just the last one, huh.  More dynamic programming needed methinks.
+--
+Okay, nowhere close to passing last test?  New dynamic stuff needed.  Probably need to pad 0s and do permutations on every step of the chain, okay!  I grok it at least.
+--
+Damn, still timed out.  All the padded zeros are probably so redundant...
+--
+Getting rid of the zeros entirely didn't work either.  Maybe an in-between way to do it?  Not to mention even something like 9999999 will generate a lot of redundant overhead :-/
+--
+Okay, just got to do it with a method that culls the permutations early.
+--
+Okay, so now it doesn't do a lot of dumb redundant calcs but it still isn't getting past 1M...  Maybe a map is inefficient?  All their keys are either 89 or 1!
+--
+Something's weird...messing up test results depending on how I test?  Some sort of memory issue?
+--
+Annoying that pure brute force gets to 1.6M compared to dynamic thing?
+--
+Maybe...optimize for numbers instead of using strings?
+--
+Nah, I got to figure out how to generate all the unique combinations and only test those numbers.
+--
+Still timing out?
+*/
+// let list = [[1, 1], [89, 89]];
+//let map = new Map(list);
+
+// function squareDigitChains(limit) {
+//   let count = 0;
+//   for (let i = 2; i < limit; i++) {
+
+//     let n = i;
+//     while (n != 89 && n != 1) {
+//       n = digitSquareSum(n);
+//     }
+//     if (n == 89) {
+//       count++
+//     }
+//   }
+//   console.log(count);
+//   return count;
+// }
+
+function squareDigitChains(limit) {
+  let arr = [];
+  arr[1] = 1;
+  arr[89] = 89;
+  const list = getDigitCombinations(limit).slice(1);
+  //console.log(list);
+  var count = 0;
+
+  for (let n of list) {
+
+    let chain = [n];
+    //Find the end
+    while (!arr[n]) {
+      n = digitSquareSum(n);
+      chain.push(n);
+    }
+    chain = chain.filter(x => x < limit);
+
+    //Find all permutations of digits of the chain elements and push to map
+    for (let i = 0 ; i < chain.length ; i++) {
+      let digits = chain[i];
+      while (digits < limit / 10) {
+        digits *= 10; //pad with 0s to get more permutations
+      }
+      let permutations = getPermutations(digits.toString().split(''));
+      // console.log(permutations);
+      for (let perm of permutations) {
+        arr[perm] = arr[n];
+      }
+      if(i == 0 && arr[n]==89){
+        count += permutations.length;
+      }
+    }
+  }
+
+  console.log(count);
+  return count
+  // let answer = arr.slice(0, limit + 1).filter(x => x == 89).length
+  // console.log("answer:", answer);
+  // return answer
+}
+// console.log(digitSquareSum(44));
+function digitSquareSum(n) {
+  let sum = 0;
+  while (n > 0) {
+    sum += (n % 10) ** 2;
+    n = Math.floor(n / 10);
+  }
+  return sum;
+}
+
+//Returns all sets of r from the options, recursive
+function getPermutations(options) {
+  let results = [];
+
+  function permute(list, prefix = '') {
+    if (!list.length) {
+      results.push(prefix);
+    }
+    let dupeCheck = []; //Cull duplicates early?
+    for (let i = 0; i < list.length; i++) {
+      let next = prefix.concat(list[i]);
+      if (dupeCheck.indexOf(next) < 0) {
+        let newList = [...list];
+        newList.splice(i, 1);
+        permute(newList, next);
+        dupeCheck.push(next);
+      }
+    }
+  }
+
+  permute(options);
+  //console.log(options, results, calcs);
+  return results;
+}
+//console.log(getDigitCombinations(100));
+
+function getDigitCombinations(limit) {
+  //const digits = [0,1,2,3,4,5,6,7,8,9];
+  let results = [];
+
+  function combosWithReplacement(prev = '', index = 0) {
+    if (prev.length == Math.log10(limit)) {
+      return
+    }
+
+    for (let i = index; i < 10; i++) {
+      let next = prev.concat(i);
+      results.push(next);
+      combosWithReplacement(next, i);
+    }
+  }
+
+  combosWithReplacement();
+  results = results.map(x => parseInt(x));
+  results = Array.from(new Set(results));
+  return results;
+}
+
+//console.log(getPermutations([9,9,9,9,8,8]))
+
+squareDigitChains(10000000);
