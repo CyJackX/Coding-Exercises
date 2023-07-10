@@ -33,68 +33,33 @@ Maybe...optimize for numbers instead of using strings?
 Nah, I got to figure out how to generate all the unique combinations and only test those numbers.
 --
 Still timing out?
+--
+Man, forget the memory array, doing it without gets to 6.8M.  I bet if I can just get a good permutation algorithm that'll be it.
+--
+Alright, testing the permutationCount.
 */
-// let list = [[1, 1], [89, 89]];
-//let map = new Map(list);
-
-// function squareDigitChains(limit) {
-//   let count = 0;
-//   for (let i = 2; i < limit; i++) {
-
-//     let n = i;
-//     while (n != 89 && n != 1) {
-//       n = digitSquareSum(n);
-//     }
-//     if (n == 89) {
-//       count++
-//     }
-//   }
-//   console.log(count);
-//   return count;
-// }
 
 function squareDigitChains(limit) {
-  let arr = [];
-  arr[1] = 1;
-  arr[89] = 89;
+
   const list = getDigitCombinations(limit).slice(1);
   //console.log(list);
   var count = 0;
 
   for (let n of list) {
-    if (arr[n]) {
-      continue
-    }
-
-    let chain = [];
-
+    let orig = n;
     //Find the end
-    while (!arr[n]) {
-      chain.push(n);
+    while (n != 1 && n != 89) {
       n = digitSquareSum(n);
     }
 
-    chain = chain.filter(x => x < limit);
-
-    //Find all permutations of digits of the chain elements and push to map
-    for (let i = 0; i < chain.length; i++) {
-      let digits = chain[i];
+    if(n == 89){
+      let digits = orig;
       while (digits < limit / 10) {
         digits *= 10; //pad with 0s to get more permutations
       }
-      let permutations = getPermutations(digits.toString().split(''));
-
-      for (let perm of permutations) {
-        arr[perm] = arr[n];
-      }
-      if (arr[n] == 89) {
-        count += permutations.length;
-      }
-
+      let permutations = permutationCount(digits.toString());
+      count+= permutations;
     }
-    // if (arr.filter(x => x == 89).length != count + 1) {
-    //   console.log(count, arr.filter(x => x == 89), arr.filter(x => x == 89).length, chain);
-    // }
   }
 
   console.log(count);
@@ -103,6 +68,7 @@ function squareDigitChains(limit) {
   // console.log("answer:", answer);
   // return answer
 }
+
 // console.log(digitSquareSum(44));
 function digitSquareSum(n) {
   let sum = 0;
@@ -113,6 +79,31 @@ function digitSquareSum(n) {
   return sum;
 }
 
+function permutationCount(str){
+  str = str.split('').sort();
+  let answer = factorial(str.length);
+  let digit, count;
+  while(str.length){
+    if(str[0] == digit){
+      count++;
+      answer /= count;
+    } else {
+      digit = str[0];
+      count = 1;
+    }
+    str.shift();
+  }
+  return answer;
+}
+
+function factorial(n){
+  let prod = 1;
+  while(n > 1){
+    prod *= n;
+    n--;
+  }
+  return prod
+}
 //Returns all sets of r from the options, recursive
 function getPermutations(options) {
   let results = [];
@@ -163,4 +154,4 @@ function getDigitCombinations(limit) {
 
 //console.log(getPermutations([9,9,9,9,8,8]))
 
-squareDigitChains(100);
+squareDigitChains(10000000);
