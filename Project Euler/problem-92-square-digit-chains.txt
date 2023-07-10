@@ -62,30 +62,39 @@ function squareDigitChains(limit) {
   var count = 0;
 
   for (let n of list) {
+    if (arr[n]) {
+      continue
+    }
 
-    let chain = [n];
+    let chain = [];
+
     //Find the end
     while (!arr[n]) {
-      n = digitSquareSum(n);
       chain.push(n);
+      n = digitSquareSum(n);
     }
+
     chain = chain.filter(x => x < limit);
 
     //Find all permutations of digits of the chain elements and push to map
-    for (let i = 0 ; i < chain.length ; i++) {
+    for (let i = 0; i < chain.length; i++) {
       let digits = chain[i];
       while (digits < limit / 10) {
         digits *= 10; //pad with 0s to get more permutations
       }
       let permutations = getPermutations(digits.toString().split(''));
-      // console.log(permutations);
+
       for (let perm of permutations) {
         arr[perm] = arr[n];
       }
-      if(i == 0 && arr[n]==89){
+      if (arr[n] == 89) {
         count += permutations.length;
       }
+
     }
+    // if (arr.filter(x => x == 89).length != count + 1) {
+    //   console.log(count, arr.filter(x => x == 89), arr.filter(x => x == 89).length, chain);
+    // }
   }
 
   console.log(count);
@@ -126,7 +135,7 @@ function getPermutations(options) {
 
   permute(options);
   //console.log(options, results, calcs);
-  return results;
+  return results.map(x => parseInt(x));
 }
 //console.log(getDigitCombinations(100));
 
@@ -154,4 +163,4 @@ function getDigitCombinations(limit) {
 
 //console.log(getPermutations([9,9,9,9,8,8]))
 
-squareDigitChains(10000000);
+squareDigitChains(100);
