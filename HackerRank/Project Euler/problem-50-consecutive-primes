@@ -1,0 +1,32 @@
+# Enter your code here. Read input from STDIN. Print output to STDOUT
+
+def longestConsecutivePrimes(N):
+    primes = sieve(N)
+
+    chainLength = primes.
+    answer = 2
+    if(isPrime(answer, primes)):
+        print(answer,chainLength)
+        return
+
+def isPrime(n, primes):
+    return n in primes
+
+def sieve(N):
+    primes = [True for i in range(N+1)]
+    p = 2
+    while p**2 <= N:
+        if primes[p]:
+            for i in range(p**2, N+1,p):
+                primes[i] = False
+        p += 1
+    
+    prime_nums = [p for p in range(2,N) if primes[p]]
+    return prime_nums
+                
+
+# n = int(input())
+# elements = [int(input()) for _ in range(n)]
+elements = [100,1000]
+for elem in elements:
+    longestConsecutivePrimes(elem)

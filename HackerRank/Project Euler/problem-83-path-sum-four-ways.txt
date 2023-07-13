@@ -1,0 +1,253 @@
+/*
+Problem 83: Path sum: four ways
+Note: This problem is a significantly more challenging version of Problem 81.
+
+In the 5 by 5 matrix below, the minimal path sum from the top left to the bottom right, by moving left, right, up, and down, is indicated in bold red and is equal to 2297.
+
+⎛⎝⎜⎜⎜⎜⎜⎜131201630537805673968036997322343427464975241039654221213718150111956331⎞⎠⎟⎟⎟⎟⎟⎟
+ 
+Find the minimal path sum from the top left to the bottom right by moving left, right, up, and down in matrix, a 2D array representing a matrix. The maximum matrix size used in tests will be 80 by 80.
+--
+Okay...now THIS is spicy.  Need to start from the end again...But need to limit it based on what sort of paths are even possible.  Maybe some consideration of what direction you're coming from.
+--
+I see, I think you have to build out SQUARES from the bottom right.  37 and 956 have to go directly to 331, it's 121 that gets to choose.
+Then the 2x2 is solved, because you'd never go out of your way when you could go direclty.  And then considering that you have to be approached from one direction you can't go back?
+I see, you'd never do a quick turn but if you loop around a number, that's valuable...
+I see.  The snake can never actually border itself cardinally.  That seems...pertinent?
+Ugh, could this have anything to do with evens/odds?  Or perhaps just skipping the first bordering line maybe, because I can see how 2x2 arrives but less 3x3
+There's something about the opposite corners, though.  805 can ONLY go to 732...etc.
+Before when you could go up/down/right, we built the problem going left.  Now that you can go any direction..., how can i do the subproblems from the bottom right?
+Wait.  It's bidirectional.
+Up down left right means it follows the same rules going either way...I can also build from the start?  Is that right?
+No, I don't think that's relevant...if I had going from bottom right to the top left it'd be different if I could only go down-right...
+But that's not it, it DOES allow following the exact same rules, not just flipped..?
+No, I'm confusing myself, the flow of the direction matters.  It's got to be built from the bottom corner.  Everything up until now has extended from consolidating the subproblems towards the end.
+
+Just how to get started on the 111/524 3x3 box?
+--
+Another thought about how the snake essentially splits the numbers into two sides...
+111 can't be approached from 422 or 956, so we can ignore going up to 150, because it HAS to be approached from there.  Then it's down to 9556, over to 121, or anything where it loops around the 121 row?
+--
+Gonna try something...
+Gotta really futz with this to build from the corners.
+--
+I made a 10x10 test grid with all the difficult paths, and I'm not sure my corner idea is going to work, especially if it has a long circuitous path.
+--
+Seems easy to find a local minima but not a global one.  I guess that's the problem.
+--
+Why can't I consider going from the top left?  Maybe I overlooked that.  It's easy to find the cheapest way to get to 96.  But to 342?  Each of the corners can maybe be approached.  Build from 4 corners, going inward?  Each node is the minimum of the 4 ways to get to it.
+--
+I mean, this matrix DOES simply follow the lowest number.  I have a feeling that wouldn't work for a tricky matrix, though?
+--
+Let me try to implement "follow the lowest number".
+First issue is circularity, it doubles back on itself...
+--
+Yes, the 80x80 one is tricky enough that it runs its snake into itself.  So dumb pathfinding doesn't work.
+--
+On second thought, maybe there's some hunt-and-peck solution where it memorizes its path and backtracks if it runs into a wall?  But then I have to keep track of past paths and values; if I overwrite them I have to remember what they were originally, and if I don't, I have to remember which way I turned.
+And none of that will still overcome "adversarial" paths with false leads.
+--
+All of this feels like it's getting into something much headier, pathfinding, etc.
+I want to create node objects, is that overkill?
+Somethign somethign I have seen in research is Djikstra's algorithm and maybe I have to implement that, so I guess I have to try to do it from scratch first if I can come to similar conclusions.
+Just based on how a path can extend wildly out of any direction or configuration from before means it just can't be dependent on the same paradigms.
+It definitely requires going from the start now, I think?
+--
+Okay, pseudocode:
+Each node updates its neighbors with the "cost to visit the neighbor", which is equal to the "cost to visit itself" PLUS "the base cost of the neighbor."
+Starting with Node 1, update its neighbors.
+
+Then, go to the next node with the lowest cost-to-visit? that hasn't been visited yet?
+
+Eventually reach a dead-end, then go back to the cheapest one to visit that hasn't been visited yet?
+repeat until all nodes visited or until end reached?
+
+--
+alright, thought about it and grok'd I think an understandable algorithm.  I think it's pretty much Djikstra's; even without pseudocode just reading the premise made it much more understandable.
+--
+Damn, it works very well.  I get it now!.
+
+*/
+/*
+function pathSumFourWays2(matrix) {
+  let len = matrix.length;
+
+  console.log(matrix);
+
+  //square is the size of the bottom right corner solving
+  for (let square = 2; square <= len; square++) {
+    let idx = len - square;
+
+    //I think I need to split the top-side from the left-side into two loops, then do the corner.
+    //Topside
+    for (let j = len - 1; j >= idx; j--) {
+      let down = matrix[idx + 1][j];
+      let leftOptions = [];
+      let leftBaseSum = matrix[idx][j - 1];
+      console.log(leftBaseSum);
+      matrix[idx][j] += Math.min(down);
+    }
+    //Leftside
+    for (let i = len - 1; i >= idx; i--) {
+      matrix[i][idx] += Math.min(0);
+    }
+
+    //Corner
+    matrix[idx][idx] += Math.min(matrix[idx + 1][idx], matrix[idx][idx + 1]); //something something
+    console.log(square, "\n", matrix);
+  }
+
+  return matrix[0][0];
+}
+*/
+
+
+// Only change code above this line
+
+const testMatrix1 = [
+  [131, 673, 234, 103, 18],
+  [201, 96, 342, 965, 150],
+  [630, 803, 746, 422, 111],
+  [537, 699, 497, 121, 956],
+  [805, 732, 524, 37, 331]
+];
+
+const testMatrix = [
+  [10, 10, 10, 10, 90, 10, 10, 10, 10, 10],
+  [10, 90, 90, 10, 90, 10, 90, 90, 99, 10],
+  [10, 90, 90, 10, 90, 10, 90, 90, 99, 10],
+  [10, 90, 90, 10, 10, 10, 90, 90, 99, 10],
+  [90, 90, 90, 90, 90, 90, 90, 90, 99, 10],
+  [90, 90, 90, 90, 90, 90, 90, 90, 99, 10],
+  [90, 90, 10, 10, 10, 99, 99, 99, 99, 10],
+  [90, 90, 10, 99, 10, 10, 10, 10, 10, 10],
+  [90, 90, 10, 10, 99, 99, 99, 99, 98, 99],
+  [90, 90, 99, 10, 10, 10, 10, 10, 10, 10],
+];
+
+function nodeBasedPathFinding(mtx) {
+
+  let len = mtx.length;
+  mtx = mtx.map(row => row.map(val => new Node(val))); // Init Node Objects
+
+  //Init neighbors
+  const coords = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+  for (let x = 0; x < len; x++) {
+    for (let y = 0; y < len; y++) {
+      for (let [dx, dy] of coords) {
+        let nx = x + dx;
+        let ny = y + dy;
+        if (isValid(nx, ny, mtx)) {
+          mtx[x][y].neighbors.push(mtx[nx][ny]);
+        }
+      }
+    }
+  }
+
+  //Initialize main loop
+  mtx[0][0].costToVisit = mtx[0][0].base
+  mtx[0][0].updateNeighbors();
+  let target = mtx[len - 1][len - 1];
+  let count = 0;
+  //console.log(nextNodes);
+  while (!target.visited) {
+    let curNode = nextNodes.shift();
+    curNode.updateNeighbors();
+    count++;
+    //console.log(count, curNode.base);    
+  }
+
+  console.log("count:", count);
+  let answer = target.costToVisit
+  console.log(answer);
+  return answer;
+}
+
+function Node(baseValue) {
+  this.base = baseValue;
+  this.costToVisit = Infinity;
+  this.neighbors = [];
+  this.visited = false;
+}
+const nextNodes = [];
+Node.prototype.updateNeighbors = function () {
+  this.visited = true;
+  for (let neighbor of this.neighbors) {    
+    neighbor.costToVisit = Math.min(neighbor.costToVisit, this.costToVisit + neighbor.base);
+    if (!neighbor.visited && nextNodes.indexOf(neighbor) < 0) {
+      binInsert(neighbor, nextNodes);
+    }
+  }
+  console.log(nextNodes.map(x => x.costToVisit));
+  //nextNodes.sort((a,b) => a.costToVisit - b.costToVisit)
+}
+
+function binInsert(node, array) {
+  let start = 0;
+  let end = array.length - 1;
+  if (array.length == 0) {
+    array.push(node)
+    return
+  }
+
+  while (start <= end) {
+    let mid = Math.floor((start + end) / 2);
+
+    if (node.costToVisit < array[mid].costToVisit) {
+      end = mid - 1;
+    } else {
+      start = mid + 1;
+    }
+  }
+  
+  array.splice(start, 0, node);
+
+}
+
+function isValid(x, y, mtx) {
+  return x >= 0 && y >= 0 && x < mtx[0].length && y < mtx.length
+}
+/*
+//Just follow the lowest number - Dumb
+function pathSumFourWays(matrix) {
+  let len = matrix.length;
+  //console.log(matrix);
+  //Just pushing infinity all around so I don't have to do a bunch of edge checks ;)
+  matrix.forEach(x => { x.push(Infinity); x.unshift(Infinity) });
+  matrix.push(Array.from({ length: matrix[0].length }, _ => Infinity));
+  matrix.unshift(Array.from({ length: matrix[0].length }, _ => Infinity));
+  //console.log(matrix);
+
+  let x = 1;
+  let y = 1;
+  let sum = matrix[x][y];
+
+  while (!(x == len && y == len)) {
+    let r = matrix[x + 1][y];
+    let d = matrix[x][y + 1];
+    let l = matrix[x - 1][y];
+    let u = matrix[x][y - 1];
+    //console.log(r,d,l,u);
+    let min = Math.min(r, d, l, u);
+    matrix[x][y] = Infinity; //To remove backtracking
+    switch (min) {
+      case r: x++;
+        break;
+      case d: y++;
+        break;
+      case l: x--;
+        break;
+      case u: y--;
+        break;
+    }
+    console.log(matrix[x][y]);
+    sum += matrix[x][y];
+  }
+  console.log(sum);
+  return sum;
+}
+*/
+function pathSumFourWays(x) {
+  return nodeBasedPathFinding(x);
+}
+nodeBasedPathFinding(testMatrix1)

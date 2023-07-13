@@ -154,4 +154,4 @@ function getDigitCombinations(limit) {
 
 //console.log(getPermutations([9,9,9,9,8,8]))
 
-squareDigitChains(10000000);
+squareDigitChains(1000);

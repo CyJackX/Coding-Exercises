@@ -47,6 +47,9 @@ Of course, instant time out.
 Every combination generates a TON of redundancies
 Maybe there's a way to work backwards?
 There are many arrangements that make duplicate values, and anything that searches through all of them is going to be too slow.
+What about counting upwards and finding every combination possible and culling from there?
+Or working from the 1,2,3,4s and counting?  But that still requires disqualifying certain numbers which means running through all their combinations.
+Maybe starting from the combinations of abcd?  There are only 126 of them!  So cull from there?
 */
 const ops = generatePermutations(['*', '+', '-', '/'], 3);
 const parentheticals = [
@@ -62,6 +65,17 @@ const parentheticals = [
   'd1 op1 ((d2 op2 d3) op3 d4)',
   'd1 op1 (d2 op2( d3 op3 d4))'
 ];
+var abcdOptions = [];
+for (let a = 1; a <= 9; a++) {
+  for (let b = a + 1; b <= 9; b++) {
+    for (let c = b + 1; c <= 9; c++) {
+      for (let d = c + 1; d <= 9; d++) {
+        abcdOptions.push('' + a + b + c + d);
+      }
+    }
+  }
+}
+console.log(abcdOptions);
 function arithmeticExpressions() {
   let abcd;
   let max = 0;
@@ -112,8 +126,8 @@ function expressionsChain(a, b, c, d) {
       }
     }
   }
-  debug.sort(a,b => a[1] - b[1]);
-  console.log(debug.join('\n'));
+  debug.sort((a, b) => a[1] - b[1]);
+  //console.log(debug.join('\n'));
   return values;
 }
 console.log("(1,2,3,4)", countMax(expressionsChain(1, 2, 3, 4)));
