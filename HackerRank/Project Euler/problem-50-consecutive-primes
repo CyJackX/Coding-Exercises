@@ -10,18 +10,14 @@
 # Now I'm getting a wrong answer somewhere?
 # Wow, everything but testcase 3 :/
 
+# Found the error, woo!
+
 def longestConsecutivePrimes(elements):
 
     for elem in elements:
-        if elem == 2:
-            print(2, 0)
-            continue
 
         #Start with biggest first link and go from there
-        chainLength = 0
-        candidate = 0
-        chainMax = 0
-        winner = 0
+        chainLength, candidate, chainMax, winner, start = 0, 0, 0, 0, 0
 
         #Find largest 2-chain first.
         while candidate <= elem:            
@@ -32,20 +28,19 @@ def longestConsecutivePrimes(elements):
             chainLength -= 1
             candidate -= primes[chainLength]
 
-        start = 0
+        
 
         # While the potential for a new chain is possible
-        while candidate <= elem:              
+        while candidate <= elem and start + chainLength < len(primes):              
 
             # While the current chain hasn't gone past max
-            while candidate <= elem:
+            while candidate <= elem and start + chainLength < len(primes):
                 if isPrime(candidate):
                     chainMax = chainLength
                     winner = candidate
 
                 candidate += primes[start + chainLength]
-                chainLength += 1
-                
+                chainLength += 1                
 
             #Restart Loop from next prime
             start += 1
@@ -109,6 +104,8 @@ def limitedSegmentedSieve(N):
 
 # n = int(input())
 # elements = [int(input()) for _ in range(n)]
-elements = [10**12, 1000, 2, 50, 100,10**6]
-primes = limitedSegmentedSieve(max(elements))
-longestConsecutivePrimes(elements)
+
+for i in range(3,101):
+    elements = [i]
+    primes = limitedSegmentedSieve(max(elements))
+    longestConsecutivePrimes(elements)
