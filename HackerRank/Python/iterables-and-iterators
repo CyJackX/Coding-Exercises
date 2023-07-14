@@ -1,0 +1,26 @@
+# Enter your code here. Read input from STDIN. Print output to STDOUT
+
+from itertools import combinations
+
+# lines = []
+# for _ in range(3):
+#     line = input()
+#     if line:
+#         lines.append(line)
+#     else:
+#         break
+
+# print(lines)
+lines = ['4', 'a a c d', '2']
+N = int(lines[0])
+arr = lines[1].split(' ')
+K = int(lines[2])
+
+count = 0
+combos = list(combinations(arr, K))
+for letters in combos:
+    # print(letters)
+    if ('a' in letters):
+        count += 1
+
+print(count/len(combos))

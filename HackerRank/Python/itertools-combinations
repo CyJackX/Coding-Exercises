@@ -1,0 +1,12 @@
+# Enter your code here. Read input from STDIN. Print output to STDOUT
+from itertools import combinations
+S = input().split(' ')
+
+str = list(S[0])
+str.sort()
+k = int(S[1])
+
+for i in range(1, k+1):
+    perms = list(combinations(str, i))
+    for perm in perms:
+        print(''.join(perm))

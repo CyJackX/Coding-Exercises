@@ -1,0 +1,10 @@
+# Enter your code here. Read input from STDIN. Print output to STDOUT
+
+from itertools import groupby
+S = input().split(' ')
+
+data = list(S[0])
+
+groups = groupby(data)
+for key, group in groups:
+    print(f"({len(list(group))}, {key})", end=" ")

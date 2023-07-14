@@ -1,0 +1,14 @@
+# Enter your code here. Read input from STDIN. Print output to STDOUT
+S = input().split(' ')
+from itertools import permutations
+str = list(S[0])
+str.sort()
+if(len(S) > 1):
+    k = int(S[1])
+else:
+    k = len(str)
+    
+perms = list(permutations(str, k))
+
+for perm in perms:
+    print(''.join(perm))

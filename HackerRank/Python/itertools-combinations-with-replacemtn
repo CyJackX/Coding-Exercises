@@ -1,0 +1,12 @@
+# Enter your code here. Read input from STDIN. Print output to STDOUT
+
+from itertools import combinations_with_replacement
+S = input().split(' ')
+
+str = list(S[0])
+str.sort()
+k = int(S[1])
+
+perms = list(combinations_with_replacement(str, k))
+for perm in perms:
+    print(''.join(perm))
