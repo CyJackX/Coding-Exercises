@@ -1,0 +1,25 @@
+# Enter your code here. Read input from STDIN. Print output to STDOUT
+
+from itertools import product
+
+inp = input().split(' ')
+K = int(inp[0])
+M = int(inp[1])
+lines = []
+for _ in range(K):
+    line = input()
+    if line:
+        lines.append(line)
+    else:
+        break
+# M = 1000
+# lines = ['2 5 4', '3 7 8 9', '5 5 7 8 9 10']
+lines = [[int(num) for num in line.split()[1:]] for line in lines]
+# print(lines)
+
+combos = list(product(*lines))
+answer = max([sum([num**2 for num in combo]) % M for combo in combos])
+# answer = max([sum([num**2 for num in combo]) % M for combo in product(*[[int(num) for num in line.split()[1:]] for line in lines])])
+
+#Didn't think I'd be able to write that list comprehension right on first try, but I got it!
+print(answer)
