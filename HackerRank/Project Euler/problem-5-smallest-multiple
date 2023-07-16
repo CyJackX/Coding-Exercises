@@ -1,0 +1,48 @@
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+from itertools import groupby
+
+def factors(n):
+    arr = []
+
+    while n % 2 == 0:
+        arr.append(2)
+        n //= 2
+
+    p = 3
+    while p*p <= n:
+        # while p divides n
+        while n % p == 0:
+            arr.append(p)
+            n //= p
+        p += 2
+
+    if n > 2:
+        arr.append(n)
+
+    return arr
+
+if __name__ == '__main__':
+    t = int(input().strip())
+
+    for t_itr in range(t):
+        n = int(input().strip())
+        facts = {}
+        for i in range(1, n+1):
+            for key, group in groupby(factors(i)):
+                group_len = len(list(group))
+                if facts.get(key, 0) <= group_len:
+                    facts[key] = group_len
+        answer = 1
+        for key,value in facts.items():
+            answer *= key**value
+        print(answer)
+        
+        
+
+

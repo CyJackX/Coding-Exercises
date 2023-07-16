@@ -69,7 +69,7 @@ def sieve(N):
                 primes[i] = False
         p += 1
 
-    prime_nums = [p for p in range(2, N) if primes[p]]
+    prime_nums = [p for p in range(2, N + 1) if primes[p]]
     return prime_nums
 
 def limitedSegmentedSieve(N):

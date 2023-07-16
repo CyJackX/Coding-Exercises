@@ -1,0 +1,23 @@
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+if __name__ == '__main__':
+    t = int(input().strip())
+
+    for t_itr in range(t):
+        n = int(input().strip()) - 1
+        three = n // 3
+        five = n // 5
+        fifteen = n // 15
+        answer = 3 * three * (three + 1) // 2 + 5 * five * (five + 1) // 2 - 15*fifteen * (fifteen + 1) // 2
+        print(answer)
+
+# Gosh, they're really going to stress optimization, huh?   Time limits on this means solving it algebraically then.
+# n(n+1)/2 - multiples of 3 - multiples of 5 plus multiples of 15
+# Whoops, had the idea backwards, was subtracting instead of adding!
+# Weird, suddenly failing some test cases.

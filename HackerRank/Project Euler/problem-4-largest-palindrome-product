@@ -1,0 +1,46 @@
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+
+def isPalindrome(n):
+    original_n = n
+    reversed_n = 0
+    while n > 0:
+        reversed_n = (reversed_n * 10) + (n % 10)
+        n //= 10
+    return original_n == reversed_n
+
+
+def largestPalindromeUnder(n):
+    maxP = 0
+    for i in range(999, 99, -1):
+        for j in range(999, 99, -1):
+            answer = i*j
+            if answer > n:
+                continue
+            if answer < maxP:
+                break
+            if isPalindrome(answer) and answer > maxP:
+                maxP = answer
+    return maxP
+
+
+if __name__ == '__main__':
+    t = int(input().strip())
+    palindromeList = []
+    for i in range(100,1000):
+        for j in range(100,1000):
+            answer = i*j
+            if(isPalindrome(answer)):
+                palindromeList.append(answer)
+    
+    # print(palindromeList)
+
+    for t_itr in range(t):
+        n = int(input().strip())
+        print(max([palindrome for palindrome in palindromeList if palindrome < n]))

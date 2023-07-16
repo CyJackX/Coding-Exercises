@@ -1,0 +1,68 @@
+# Well, I tried to generate everything up to 5*10**6 and it overflowed, so I guess that idea's out.
+# 2^chainLength I guess is really the problem...
+# I guess it's another dynamic list.
+
+if __name__ == '__main__':
+    
+    N = 5*10**6
+    chainLengths = [0] * (N + 1)
+    chainLengths[1] = 1
+    
+    # arr[0] = None
+    # arr[1] = 1
+    # filledCount = 1
+    # chainLength = 2
+    # nextNodes = [1]
+    # while filledCount < N:
+    #     evens = [2*node for node in nextNodes]
+    #     odds = [(node - 1)//3 for node in nextNodes 
+    #             if (node - 1) % 3 == 0 and
+    #             (node - 1)//3 % 2 != 0 and
+    #             node != 1 and 
+    #             node != 4]
+    #     nextNodes = evens + odds
+    #     for node in nextNodes:
+    #         if node <= N and arr[node] == 0:
+    #             arr[node] = chainLength
+    #             filledCount +=1
+    #     chainLength += 1
+    # print(arr)
+    # max = 0
+    # winner = 0
+    # for i in range(1, N + 1):
+    #     if arr[i] >= max:
+    #         max = arr[i]
+    #         winner = i
+    #     arr[i] = winner
+    for num in range(1, N+1):
+        i = num
+        if chainLengths[i]:
+            continue
+
+        chain = []
+        while(i > N or not chainLengths[i]):
+            chain.append(i)
+            if i % 2 == 0:
+                i = i // 2
+            else:
+                i = 3 * i + 1
+        
+        for j in range(len(chain)):
+            if chain[j] <= N:
+                chainLengths[chain[j]] = len(chain) + chainLengths[i] - j
+
+    # print(chainLengths)
+    maxAnswers = [0] * (N + 1)
+    maxLength = 0
+    winningID = 0
+    for i in range(1, N + 1):
+        if chainLengths[i] >= maxLength:
+            maxLength = chainLengths[i]
+            winningId = i
+        maxAnswers[i] = winningId
+    # print(maxAnswers)
+                
+    t = int(input().strip())
+    for t_itr in range(t):
+        n = int(input().strip())
+        print(maxAnswers[n])
