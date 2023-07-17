@@ -1,0 +1,41 @@
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+def gcd(x,y):
+    while(y):
+       x, y = y, x % y
+    return abs(x)      
+
+def maxPythagoreanTriplet(N):
+    max = -1
+    m = 2
+    while(2 * m * (1 + m) <= N):
+        for n in range(1, m):
+            if gcd(m,n) != 1 or (m+n) % 2 == 0:
+                continue
+            a = m*m - n*n
+            b = 2*m*n
+            c = m*m + n*n
+
+            p = a + b + c            
+            if N % p == 0:
+                prod = a*b*c*(N//p)**3
+                if prod > max:
+                    max = prod      
+        m += 1
+    
+    print(max)
+
+maxPythagoreanTriplet(24)
+
+      
+
+if __name__ == '__main__':
+    t = int(input().strip())
+
+    for t_itr in range(t):
+        n = int(input().strip())

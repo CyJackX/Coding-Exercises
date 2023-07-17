@@ -1,0 +1,20 @@
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+def largestPrimeFactor(n):
+    for i in range(2, int(n**.5)+ 1):
+        if n % i == 0:
+            return largestPrimeFactor(n//i)
+    return n
+
+if __name__ == '__main__':
+    t = int(input().strip())
+
+    for t_itr in range(t):
+        n = int(input().strip())
+        print(largestPrimeFactor(n))

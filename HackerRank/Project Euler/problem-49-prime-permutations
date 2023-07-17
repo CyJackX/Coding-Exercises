@@ -1,0 +1,86 @@
+from itertools import permutations
+from itertools import groupby
+
+# def isPrime(n):
+#     if n < 2:
+#         return False
+#     if n == 2:
+#         return True
+#     for prime in primes:
+#         if n % prime == 0:
+#             return False
+#         if prime**2 > n:
+#             return True
+
+def sieve(N):
+    primes = [True for i in range(N+1)]
+    p = 2
+    while p**2 <= N:
+        if primes[p]:
+            for i in range(p**2, N+1, p):
+                primes[i] = False
+        p += 1
+
+    prime_nums = [p for p in range(2, N + 1) if primes[p]]
+    return prime_nums
+
+def group_primes_by_permutation(primes):
+    # Create a key function that sorts the digits of a number
+    key_func = lambda prime: ''.join(sorted(str(prime)))
+
+    # Sort primes by the key function
+    primes.sort(key=key_func)
+
+    # Group primes by the key function
+    grouped_primes = groupby(primes, key_func)
+
+    # Convert each group to a list and return all groups
+    return [list(group) for _, group in grouped_primes]
+
+
+primes = sieve(1000000)
+primeGroups = sorted([group for group in group_primes_by_permutation(primes) if len(group)>=3], key = lambda x: x[0])
+# print(primeGroups)
+
+if __name__ == '__main__':
+
+    NK = input().split(' ')
+    N = int(NK[0])
+    K = int(NK[1])
+    fullList = []
+
+    for primeGroup in primeGroups:
+
+        length = len(primeGroup)
+        maximum = max(primeGroup) 
+        for z in range(length):     
+            first = primeGroup[z]
+
+            if first >= N:
+                break
+
+            #Check all possible second values
+            for secondidx in range(z + 1, length):
+
+                #calculate Delta between first and second to find third or fourth
+                delta = primeGroup[secondidx] - first
+                third = first + 2*delta
+
+                #If third is beyond the top number, break
+                if third > maximum:
+                    break
+
+                #If third is in the group, build string and add to list.
+                if third in primeGroup:
+                    combo = str(first) + str(first + delta) + str(third)
+                    if K == 3:                             
+                        fullList.append(combo)
+
+                    # If K == 4
+                    elif first + 3*delta in primeGroup:
+                        combo += str(first + 3*delta)
+                        fullList.append(combo)
+    
+    fullList.sort(key = lambda x: int(x))
+    for item in fullList:
+        print(item)

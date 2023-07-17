@@ -1,3 +1,25 @@
+function processData(input) {
+    input = input.split('\n')
+    let N = input.shift();
+    let mtx = [];
+    for(let i = 0 ; i < N ; i++){
+        mtx.push(input[i].split(' ').map(x => parseInt(x)));
+    }
+    //console.log(mtx);
+    return nodeBasedPathFinding(mtx);
+} 
+
+process.stdin.resume();
+process.stdin.setEncoding("ascii");
+_input = "";
+process.stdin.on("data", function (input) {
+    _input += input;
+});
+
+process.stdin.on("end", function () {
+   processData(_input);
+});
+
 /*
 Problem 83: Path sum: four ways
 Note: This problem is a significantly more challenging version of Problem 81.

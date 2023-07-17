@@ -1,0 +1,33 @@
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+def multiplyDigits(string):
+    prod = 1
+    for i in range(len(string)):
+        prod *= int(string[i])
+    return prod
+        
+
+if __name__ == '__main__':
+    t = int(input().strip())
+
+    for t_itr in range(t):
+        first_multiple_input = input().rstrip().split()
+
+        n = int(first_multiple_input[0])
+
+        k = int(first_multiple_input[1])
+
+        num = input()
+        answer = 0
+        for i in range(n - k):
+            answer = max(answer, multiplyDigits(num[i:i+k]))
+        print(answer)
+            
+            
+            
