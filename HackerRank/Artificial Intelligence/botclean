@@ -1,0 +1,28 @@
+#!/usr/bin/python
+
+# Head ends here
+
+def locationOf(target, grid):
+    for i, row in enumerate(grid):
+        if target in row:
+            return [i, row.index(target)]
+
+def next_move(posr, posc, board):
+    p = locationOf('d', board)
+    if p[0] < posr:
+        print('UP')
+    elif p[0] > posr:
+        print('DOWN')
+    elif p[1] > posc:
+        print('RIGHT')
+    elif p[1] < posc:
+        print('LEFT')
+    else:
+        print('CLEAN')
+
+# Tail starts here
+
+if __name__ == "__main__":
+    pos = [int(i) for i in input().strip().split()]
+    board = [[j for j in input().strip()] for i in range(5)]
+    next_move(pos[0], pos[1], board)

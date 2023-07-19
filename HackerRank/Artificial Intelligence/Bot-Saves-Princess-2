@@ -1,0 +1,23 @@
+def locationOf(target, grid):
+    for i, row in enumerate(grid):
+        if target in row:
+            return [i, row.index(target)]
+
+def nextMove(n,r,c,grid):
+    p = locationOf('p', grid)
+    if p[0] < r:
+        return 'UP'
+    if p[0] > r:
+        return 'DOWN'
+    if p[1] > c:
+        return 'RIGHT'
+    if p[1] < c:
+        return 'LEFT'
+
+n = int(input())
+r,c = [int(i) for i in input().strip().split()]
+grid = []
+for i in range(0, n):
+    grid.append(input())
+
+print(nextMove(n,r,c,grid))
