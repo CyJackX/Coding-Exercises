@@ -75,7 +75,7 @@ for (let a = 1; a <= 9; a++) {
     }
   }
 }
-console.log(abcdOptions);
+// console.log(abcdOptions);
 function arithmeticExpressions() {
   let abcd;
   let max = 0;
@@ -130,7 +130,7 @@ function expressionsChain(a, b, c, d) {
   //console.log(debug.join('\n'));
   return values;
 }
-console.log("(1,2,3,4)", countMax(expressionsChain(1, 2, 3, 4)));
+console.log(countMax(expressionsChain(1, 2, 3, 4)));
 function countMax(set) {
   let count = 0;
   while (set.has(count + 1)) {
