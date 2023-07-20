@@ -1,0 +1,259 @@
+
+import cProfile
+
+def sieve(N):
+    primes = [True for i in range(N+1)]
+    p = 2
+    while p**2 <= N:
+        if primes[p]:
+            for i in range(p**2, N+1, p):
+                primes[i] = False
+        p += 1
+
+    prime_nums = [p for p in range(2, N + 1) if primes[p]]
+    # print("simple sieve done")
+    return prime_nums
+
+
+def segmentedSieve(N):
+    limit = int(N**.5)+1
+    start = limit
+    end = start * 2
+    primes = sieve(start)
+    length = len(primes)
+
+    while start <= N:
+        mark = [True for i in range(start+1)]
+        for i in range(length):
+            loLim = int((start/primes[i])) * primes[i]
+            if loLim < start:
+                loLim += primes[i]
+            for j in range(loLim, end, primes[i]):
+                mark[j-start] = False
+
+        for i in range(start, end):
+            if mark[i-start] == True:
+                primes.append(i)
+
+        start += limit
+        end += limit
+    return primes
+
+# def isPrime(n):
+#     if n < MAXPRIME:
+#         return n in primeSet
+#     for prime in primes:
+#         if n % prime == 0:
+#             return False
+#         if prime**2 > n:
+#             return True
+
+
+def isPrime(n):
+    if n < MAXPRIME:
+        return n in primeSet
+
+    return miller_rabin_test(n)
+
+#Deterministic up to 4759123141
+def miller_rabin_test(n):
+    # Not necessary here
+    # if n <= 1 or (n != 2 and n % 2 == 0):
+    #     return False
+    # if n == 2 or n == 3:
+    #     return True
+
+    # Write n-1 as 2^r * d
+    # Keep halving n-1 until it's odd, tracking the count
+    r, d = 0, n - 1
+    while d % 2 == 0:
+        r += 1
+        d //= 2
+
+    # Using the deterministic bases 2, 7, and 61 for numbers < 4,759,123,141
+    for a in [2, 7, 61]:
+        # if n == a:  # If n is one of the bases, it's prime
+        #     return True
+        
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            continue
+        for _ in range(r - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False  # Composite
+
+    return True  # Probably prime
+
+
+# def num_digits(n):
+#     """Return the number of digits in n."""
+#     if n == 0:
+#         return 1
+#     return math.floor(math.log10(n)) + 1
+
+
+def isRemarkable(x, y):
+    # a = y * (10 ** num_digits(x)) + x
+    # b = x * (10 ** num_digits(y)) + y
+    a = int(str(x) + str(y))
+    b = int(str(y) + str(x))
+    return isPrime(a) and isPrime(b)
+
+
+# def sumDigits(n):
+#     sum = 0
+#     while n > 0:
+#         sum += n % 10
+#         n //= 10
+#     return sum
+
+
+def find_cliques(graph, k):
+    
+    # Prune nodes with fewer than k-1 neighbors
+    pruned_nodes = {key for key, value in graph.items() if len(value) < k-1}
+    graph = {key: neighbors - pruned_nodes for key, neighbors in graph.items() if key not in pruned_nodes}
+
+
+    if k == 1:
+        # Base case: each node is a 1-clique
+        return [frozenset([node]) for node in graph.keys()]
+
+    smaller_cliques = find_cliques(graph, k-1)  # Recursive call
+    k_cliques_set = set()
+
+    for clique in smaller_cliques:
+        clique_iterator = iter(clique)
+        node_from_clique = next(clique_iterator)
+        common_neighbors = graph[node_from_clique].copy()
+
+        # Iterate over the remaining nodes in the clique
+        for node in clique_iterator:
+            common_neighbors &= graph[node]  # Set intersection
+
+        # Combine the current (k-1)-clique with each of the common neighbors to get k-cliques
+        for neighbor in common_neighbors:
+            if neighbor not in clique:
+                k_cliques_set.add(clique | frozenset([neighbor]))
+
+    return list(k_cliques_set)
+
+# def find_cliques(graph, k):
+#     def explore_cliques(start, visited, depth):
+#         if depth == k:
+#             return [frozenset(visited)]
+        
+#         cliques = []
+#         neighbors = graph[start] - visited
+#         for next_node in neighbors:
+#             cliques.extend(explore_cliques(next_node, visited | {start}, depth + 1))
+        
+#         return cliques
+    
+#     result = set()
+#     nodes = set(graph.keys())
+    
+#     while nodes:
+#         node = nodes.pop()
+#         result.update(explore_cliques(node, set(), 1))
+    
+#     return list(result)
+
+
+
+def evaluatePairedPrimes(listOfPrimes):
+    answer = defaultdict(set)
+    length = len(listOfPrimes)
+    for i in range(length):        
+        for j in range(i+1, length):
+            p1 = listOfPrimes[i]
+            p2 = listOfPrimes[j]
+            if isRemarkable(p1, p2):
+                answer[p1].add(p2)
+                answer[p2].add(p1)
+    return answer
+
+from collections import defaultdict
+from multiprocessing import Pool
+MAXPRIME = 10**5
+primes = sieve(MAXPRIME)
+primeSet = set(primes)
+
+if __name__ == '__main__':
+    profiler = cProfile.Profile()
+    profiler.enable()
+    NK = [20000, 3]
+    # NK = input().split(' ')    
+
+    N = int(NK[0])
+    K = int(NK[1])
+    
+    
+    # print("primes done")
+
+    # All primes beneath N
+    # Because we will be overwriting candidates as we go
+    eligiblePrimes = [prime for prime in primes if prime < N]
+    eligiblePrimes.remove(2)
+    eligiblePrimes.remove(5)
+
+    # Hot tip from the internet...I was trying to check in isRemarkable for sumOfDigits being 3, but I guess you can do that here and cut the groups in half
+    eligiblePrimes1 = [3] + [p for p in eligiblePrimes if p % 3 == 2]
+    eligiblePrimes2 = [3] + [p for p in eligiblePrimes if p % 3 == 1]
+
+    # Ah, I see, there's a way to cull all of them down after the first pairs are made...
+    # They all essentially become a set of nodes!
+    # I think I can use an object/dictionary that has the primes as the key, and a set as its neighbors.
+    
+    pairs1 = evaluatePairedPrimes(eligiblePrimes1)
+    pairs2 = evaluatePairedPrimes(eligiblePrimes2)
+    #FWIW I do not like involving parallel processing, as it seems outside the scope of traditional algorithmic puzzle solving...
+    # with Pool(processes=2) as pool:
+    #     prime_pairs_list = pool.map(evaluatePairedPrimes, [eligiblePrimes1, eligiblePrimes2])
+    # prime_pairs_list = [evaluatePairedPrimes(eligiblePrimes1), evaluatePairedPrimes(eligiblePrimes2)]
+
+    # for local_pairs in prime_pairs_list:
+    #     for key, value in local_pairs.items():
+    #         pairs[key].update(value)
+    # pairs = dict(sorted(pairs.items()))
+
+    # find cliques    
+    cliques = find_cliques(pairs1, K) + find_cliques(pairs2,K)
+
+    #sum answers
+    sums = [sum(s) for s in cliques]
+    sums.sort()
+    result = '\n'.join(map(str,sums))
+    print(result)
+
+    profiler.disable()
+    profiler.print_stats(sort="cumulative")
+
+
+# # Build the candidates elements until they are K length
+# # Start with all eligible primes
+# candidates = [[prime] for prime in primes if prime < N]
+# for _ in range(1, K):
+
+#     nextCandidates = []
+
+#     #For each group of already-made candidates, find all other possibilities.
+#     for group in candidates:
+#         for i in range(eligiblePrimes.index(group[-1])+ 1, len(eligiblePrimes)):
+#             candidate = eligiblePrimes[i]
+#             if candidate < group[-1]:
+#                 continue
+#             if isRemarkable(candidate, group):
+#                 next = group.copy()
+#                 next.append(candidate)
+#                 nextCandidates.append(next)
+
+#     candidates = nextCandidates
+
+# candidates = [reduce(operator.add, group) for group in candidates]
+# candidates.sort()
+# for x in candidates:
+#     print(x)
