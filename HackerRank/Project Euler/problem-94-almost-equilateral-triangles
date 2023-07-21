@@ -1,0 +1,142 @@
+# 15 <= N <= 10**18!
+# Definitely need some memoization, or a sieve? Because every multiple stacks up.
+# Okay, first, triangles must be of the form perimter = 1 + 3 * n, so we can just...generate those directly
+# Don't' forget 3n - 1
+# Then check if those triangles have integer areas.  b^2 = c^2 - a^2, b^2*a^2 = int?
+# Wait, why not just generate it all in reverse?  What do I mean?  Not sure.  I'm just sure there's lots of negatives versus positives.
+# Okay, I think there is a Diophantine equation involved.
+# Was able to rearrange the problem into a diophantine equation.
+# Given equal sides of length a, base of a +- 1, and height h, rearranging the pythagorean equation for h and a can reach a quadratic of
+# (2*(3h**2 + 1)**.5 +-1)/3.  Since 3h**2 + 1 must be a perfect square, set it equal to k^2.  Pell's equation.
+
+
+import math
+import cProfile
+
+
+def is_perfect_square(n):
+    root = math.isqrt(n)
+    return root * root == n
+
+# Diophantine
+
+
+def continued_fractions_sqrt(i):
+    a0 = int(i**.5)  # Integer square root
+    sqrt_i = i**.5
+    num = 1  # numerator
+    # denominator, assuming it's of the form (numerator/(sqrt(i) - denominator))
+    den = a0
+    arr = [a0]
+
+    while True:
+        an = num // (sqrt_i - den)
+        arr.append(int(an))
+        num = (i - den**2) // num
+        den = an * num - den
+
+        if arr[-1] == 2 * a0:
+            break
+
+    return arr
+
+
+def nthConvergent(n, arr):
+    pk = arr[0]
+    qk = 1
+    p1 = 1
+    q1 = 0
+    period = len(arr) - 1
+    for i in range(1, n+1):
+        m = arr[(i - 1) % period + 1]
+        pk, p1 = pk * m + p1, pk
+        qk, q1 = qk * m + q1, qk
+    return pk, qk
+
+
+def sumPerimetersPell(N):
+    sum_ = 0
+
+    D = 3
+    fracs = continued_fractions_sqrt(D)
+    x1 = 0
+    y1 = 0
+    i = 0
+    while (x1*x1 - D*y1*y1 != 1):
+        i += 1
+        [x1, y1] = nthConvergent(i, fracs)
+    
+    xk,yk = x1,y1
+    p = 0
+    while p <= N:
+        xk,yk = x1*xk + D*yk*y1, xk*y1 + yk*x1
+        for dif in [1,-1]:
+            if (2*xk + dif ) % 3 == 0:
+                a = (2*xk + dif ) // 3
+                p = 3*a + dif
+                if p <= N:
+                    print(a,a, a + dif)
+                    sum_ += p        
+    
+    print(sum_)
+
+def sumPerimeters(N):
+    sum_ = 0
+    c = 3
+    calcs = 0
+    hits = 0
+    while (3*c - 1 <= N):
+        for dif in [-1, 1]:
+            calcs += 1
+            a = c + dif
+            # print((a*(4*c*c-a*a)**.5) % 4)
+            # print((3*c*c-dif*2*c - 1)**.5 , c,c,a)
+            discrim = 4*c*c-a*a
+            if is_perfect_square(discrim) and (a*(discrim)**.5) % 4 == 0:
+                hits += 1
+                # if(c % 2 == 0):
+                # print(is_perfect_square(4*c*c-a*a))
+                # print((a*(4*c*c-a*a)**.5))
+                # print(c,c,a, herons(c,c,a))
+                sum_ += 3*c + dif
+        c += 1
+    print(sum_)
+    print(hits/calcs)
+    return sum_
+
+def herons(a,b,c):
+    s = (a+b+c)/2
+    return (s*(s-a)*(s-b)*(s-c))**.5
+
+# def sumPerimeters2(N):
+#     sum_ = 0
+#     n = 3
+
+#     while(True):
+#         for dif in [-1,1]:
+#             c = ((3*n*n + 4)**.5 + dif) / 3
+#             p = 3*c + dif
+#             a = c + dif
+#             # print(n, c,c,c+dif)
+#             if 3 * c - 1 <= N:
+#                 if c % 1 == 0 and (a*(4*c*c-a*a)**.5) % 4 == 0:
+#                     print(n, c,c,c+dif)
+#                     sum_ += int(p)
+#             else:
+#                 print(sum_)
+#                 return sum_
+#         n += 1
+
+
+profiler = cProfile.Profile()
+profiler.enable()
+test = 10**18
+sumPerimetersPell(test)
+# sumPerimeters(test)
+profiler.disable()
+profiler.print_stats(sort="cumulative")
+
+
+# if __name__ == '__main__':
+#     for _ in range(int(input())):
+#         sumPerimeters(int(input()))
