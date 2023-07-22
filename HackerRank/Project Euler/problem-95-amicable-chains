@@ -1,0 +1,45 @@
+def sumOfProperDivisors(n):
+    sum_div = 1
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            sum_div += i
+            if i * i != n:
+                sum_div += n // i
+    # print(f"Sum of Proper Divisors of {n} is {sum_div}")
+    return sum_div
+
+# print(sumOfProperDivisors(90))
+
+def generateDictionary(N):
+    arr = [1] * (N+1)
+    for i in range(2, N // 2 + 1):
+        for j in range(2*i, N+1, i):
+            arr[j] += i
+    return arr
+
+def longestChainUnder(N):
+    dictionary = generateDictionary(N)
+    #filter primes
+
+    dictionary = {index: value for index,value in enumerate(dictionary) if value > 1 and value < N}
+    maxChainLength = 0
+    maxChainID = N+1
+    for start in dictionary.keys():
+        chain = [start]
+        while(dictionary.get(chain[-1])):
+            next = dictionary.get(chain[-1])
+            if next in chain:
+                length = len(chain[chain.index(next):])
+                if length > maxChainLength:
+                    maxChainLength = len(chain)
+                    maxChainID = next
+                break
+            else:
+                chain.append(next)
+        for key in chain:
+            if key in dictionary.keys():
+                dictionary[key] = None
+        
+    print(maxChainID)
+
+longestChainUnder(int(300))
