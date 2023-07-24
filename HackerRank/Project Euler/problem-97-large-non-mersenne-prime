@@ -1,0 +1,32 @@
+import math
+# inputs = []
+# for _ in range(int(input())):
+#     inputs.append([int(x) for x in input().split(' ')])
+# # print(inputs)
+
+# #Seems I need to learn some rules about how digits change overtime?
+
+# answer = 0
+# for row in inputs:
+#     A = row[0]
+#     B = row[1]
+#     C = row[2]
+#     D = row[3]
+#     tmp = A
+#     for _ in range(C):
+#         tmp = (tmp*B) % 10**12
+#     tmp += D
+#     answer += tmp % 10**12
+# print(str(answer).zfill(12))
+
+def powmod(base, exponent, mod):
+    exponent = [int(x) for x in list(bin(exponent)[2:])]
+    result = 1
+    for bit in exponent:
+        result *= result 
+        if bit:
+            result *= base
+        result %= mod
+    return result
+
+print(powmod(2,700000000,10**12))
