@@ -1,0 +1,193 @@
+# def checkGrid( 2`] )
+# rows = []
+# cols = []
+# squares = []
+# grid = []
+# for _ in range(9):
+#     rows.append([int(x) for x in input()])
+#     cols.append([])
+#     squares.append([])
+# for i in range(9):
+import copy
+import cProfile
+
+
+class Sudoku:
+    def __init__(self, grid):
+        self.rows = [[] for _ in range(9)]
+        self.cols = [[] for _ in range(9)]
+        self.squares = [[] for _ in range(9)]
+        self.cells = []
+        for i in range(9):
+            for j in range(9):
+                # Bi-directional references from Cell to Sudoku Grid
+                row = self.rows[i]
+                col = self.cols[j]
+                square = self.squares[Sudoku.squareIndex(i, j)]
+                newCell = Cell(grid[i][j], row, col, square, i, j)
+                row.append(newCell)
+                col.append(newCell)
+                square.append(newCell)
+                self.cells.append(newCell)
+        self.update()
+
+    @staticmethod
+    def squareIndex(i, j):
+        j //= 3
+        if i < 3:
+            return j
+        if i < 6:
+            return j + 3
+        return j + 6
+
+    def updateCellAt(self, i, j, value):
+        self.rows[i][j].value = value
+        self.update()
+
+    def isFilled(self):
+        return not any(cell.value == 0 for cell in self.cells)
+
+    @staticmethod
+    def noDuplicates(subGrouping):
+        for group in subGrouping:
+            nonZeros = [x for x in group if x != 0]
+            if len(nonZeros) != len(set(nonZeros)):
+                return False
+        return True
+
+    def isValid(self):
+        return self.noDuplicates(self.rows) and self.noDuplicates(self.cols) and self.noDuplicates(self.squares)
+
+    def print(self):
+        for row in self.rows:
+            string = "".join([str(cell.value) for cell in row])
+            print(string)
+
+    def clone(self):
+        rows = []
+        for row in self.rows:
+            rows.append([cell.value for cell in row])
+        return Sudoku(rows)
+
+    def updateNakedSingles(self):
+        for cell in self.cells:
+            if cell.value:
+                for neighbor in cell.row:
+                    neighbor.candidates.discard(cell.value)
+                for neighbor in cell.column:
+                    neighbor.candidates.discard(cell.value)
+                for neighbor in cell.square:
+                    neighbor.candidates.discard(cell.value)
+                # cell.candidates = set([cell.value]) # perhaps useful to keep itself as a member of the set for set/candidate operations later?
+                cell.candidates.clear()
+
+    def hiddenSingles(subGroup):
+        # All candidates in subGroup
+        allCandidates = set().union(*[cell.candidates for cell in subGroup])
+
+        for candidate in allCandidates:
+            # Create a list of cells that have this candidate
+            cells_with_candidate = [
+                cell for cell in subGroup if candidate in cell.candidates]
+
+            # If only one cell has this candidate, it's a hidden single, change it's candidates to 1.
+            if len(cells_with_candidate) == 1:
+                hidden = cells_with_candidate[0]
+                hidden.candidates = set([candidate])
+
+    def update(self):
+
+        # The update loop, where all strategies are employed until backtracking is needed.
+        while (True):
+            # Naked Singles
+            self.updateNakedSingles()
+
+            # Hidden Singles
+            for row in self.rows:
+                Sudoku.hiddenSingles(row)
+            for col in self.cols:
+                Sudoku.hiddenSingles(col)
+            for square in self.squares:
+                Sudoku.hiddenSingles(square)
+
+            # Fill in and loop if any candidates were reduced to one
+            solvedCells = [cell for cell in self.cells if cell.value == 0 and len(
+                cell.candidates) == 1]
+            if solvedCells:
+                for cell in solvedCells:
+                    cell.value = list(cell.candidates)[0]
+                    cell.candidates.clear()
+            else:
+                break
+        pass
+
+# Recursive solve, employing strategies to cull along the way.
+
+
+def solve(sudoku):
+    # sudoku.print()
+    if sudoku.isFilled():
+        return sudoku
+
+    # Sort empty cells by # of candidates
+    cells = sudoku.cells
+    cells = [cell for cell in cells if cell.value == 0]
+    cells.sort(key=lambda x: len(x.candidates))
+
+    # Get cell with lowest number of candidates
+    cell = cells[0]
+    for candidate in cell.candidates:
+        # Clone
+        clone = copy.deepcopy(sudoku)
+
+        # Change cell value to a candidate
+        clone.updateCellAt(cell.i, cell.j, candidate)
+
+        solution = solve(clone)
+        if solution:
+            return solution
+        # else:
+        #     print('deadend')
+
+
+class Cell:
+    def __init__(self, value, row, column, square, i, j):
+        self.i = i
+        self.j = j
+        self.value = value
+        self.row = row
+        self.column = column
+        self.square = square
+        self.candidates = set([1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+    def __repr__(self):
+        return str(self.value) + " " + str(self.candidates)
+
+
+with open('.\HackerRank\Project Euler\p096_sudoku.txt', 'r') as file:
+    content = file.read().split('\n')
+
+profiler = cProfile.Profile()
+profiler.enable()
+for i in range(len(content)//10):
+    # for i in range(1):
+    rows = []
+    for j in range(9):
+        rows.append([int(x) for x in content[10*i + j + 1]])
+    # print(rows)
+    sudoku = Sudoku(rows)
+    print(i)
+    sudoku.print()
+    sudoku = solve(sudoku)
+    sudoku.print()
+
+profiler.disable()
+profiler.print_stats(sort="cumulative")
+
+# For HackerRank
+# rows = []
+# for _ in range(9):
+#     rows.append([int(x) for x in input()])
+# sudoku = Sudoku(rows)
+# # sudoku.print()
+# sudoku.solve()
