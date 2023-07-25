@@ -1,0 +1,6 @@
+# Enter your code here. Read input from STDIN. Print output to STDOUT
+for _ in range(int(input())):
+    N = int(input())
+    answer = (-9 + 8*N + 3*N**2 + 4*N**3)//6 % (10**9 +7)
+    print(answer)
+# Just cubic polynomials

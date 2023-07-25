@@ -1,0 +1,57 @@
+function processData(input) {
+    input = input.split('\n').map(x => parseInt(x))
+    input.shift()
+    let memo = [0, 0, 0]
+    let max = { "d": 0, "length": 0 };
+    for (let i = 3; i < 10000; i ++) {
+        memo[i] = max.d
+        if (repetendLength(i) > max.length) {
+            max = { "d": i, "length": repetendLength(i) };
+            //   console.log(max);
+        }
+        
+    }
+    for (let n of input) {
+        console.log(memo[n])
+    }
+}
+
+process.stdin.resume();
+process.stdin.setEncoding("ascii");
+_input = "";
+process.stdin.on("data", function (input) {
+    _input += input;
+});
+
+process.stdin.on("end", function () {
+    processData(_input);
+});
+function reciprocalCycles(n) {
+    let max = { "d": 0, "length": 0 };
+    for (let i = 3; i < n; i += 2) {
+        let repetend = repetendLength(i)
+        if (repetend > max.length) {
+            max = { "d": i, "length": repetend };
+            //   console.log(max);
+        }
+    }
+    return max.d;
+}
+
+function repetendLength(n) {
+    if (n % 2 == 0 || n % 5 == 0) {
+        return 0;
+    }
+    let dividend = 1;
+    let length = 0;
+    let quot;
+    do {
+        dividend *= 10;
+        dividend = dividend % n;
+        //console.log(dividend, quot)
+        length++;
+    } while (dividend != 1)
+
+    return length;
+}
+// console.log(repetendLength(659));
