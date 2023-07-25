@@ -1,0 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+class Solution {
+    static void Main(String[] args) {
+        int N = Convert.ToInt32(Console.ReadLine());
+        long[][] inputs = new long[N][];  // Declare inputs as a jagged array of long
+        for (int i = 0; i < N; i++)
+        {
+            inputs[i] = Console.ReadLine().Split(' ').Select(long.Parse).ToArray();
+        }
+        int K = Convert.ToInt32(Console.ReadLine());
+
+        inputs = inputs.OrderBy(pair => pair[1] * Math.Log(pair[0])).ToArray();
+        Console.WriteLine(string.Join(" ", inputs[K-1]));
+
+    }
+}
