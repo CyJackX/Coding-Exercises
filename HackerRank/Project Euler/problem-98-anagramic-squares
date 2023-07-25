@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+class Solution {
+    static void Main(string[] args) {
+        int N = Convert.ToInt32(Console.ReadLine());
+        int digits = N - 1;
+        long start = (long)Math.Ceiling(Math.Sqrt(Math.Pow(10, digits)));
+        long end = (long)Math.Sqrt(Math.Pow(10, N));
+        List<long> squares = new List<long>();
+        
+        // List of all N-digit squares
+        for (long i = start; i <= end; i++) {
+            squares.Add(i * i);
+        }
+        // Console.WriteLine(string.Join(", ", squares));
+        
+        var anagramGroups = squares
+            .GroupBy(sq => AnagramKey(sq))
+            .Where(group => group.Count() > 1)
+            .ToList();
+
+        int maxSize = anagramGroups.Max(g => g.Count());
+        var largestElementAmongTiedGroups = anagramGroups
+            .Where(g => g.Count() == maxSize)
+            .SelectMany(g => g)  // Flatten the groups
+            .Max();
+
+        Console.WriteLine(largestElementAmongTiedGroups);
+    }
+    
+    static long AnagramKey(long number)
+    {
+        // Assign a unique prime to each digit
+        int[] primes = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
+        long product = 1;
+
+        while (number > 0)
+        {
+            int digit = (int)(number % 10);
+            product *= primes[digit];
+            number /= 10;
+        }
+
+        return product;
+}
+
+}

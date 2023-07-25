@@ -1,24 +1,10 @@
-import math
-# inputs = []
-# for _ in range(int(input())):
-#     inputs.append([int(x) for x in input().split(' ')])
-# # print(inputs)
 
-# #Seems I need to learn some rules about how digits change overtime?
+inputs = []
+for _ in range(int(input())):
+    inputs.append([int(x) for x in input().split(' ')])
+# print(inputs)
 
-# answer = 0
-# for row in inputs:
-#     A = row[0]
-#     B = row[1]
-#     C = row[2]
-#     D = row[3]
-#     tmp = A
-#     for _ in range(C):
-#         tmp = (tmp*B) % 10**12
-#     tmp += D
-#     answer += tmp % 10**12
-# print(str(answer).zfill(12))
-
+#Seems I need to learn some rules about how digits change overtime?
 def powmod(base, exponent, mod):
     exponent = [int(x) for x in list(bin(exponent)[2:])]
     result = 1
@@ -29,4 +15,15 @@ def powmod(base, exponent, mod):
         result %= mod
     return result
 
-print(powmod(2,700000000,10**12))
+answer = 0
+for row in inputs:
+    A = row[0]
+    B = row[1]
+    C = row[2]
+    D = row[3]
+    mod = 10**12
+    answer += A * powmod(B,C,mod) + D
+    answer %= mod
+print(str(answer).zfill(12))
+
+
