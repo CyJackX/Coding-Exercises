@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "x:\\My Drive\\Coding Exercises\\HackerRank\\Project Euler\\problem-100-arranged-probability\\problem-100-arranged-probability\\problem-100-arranged-probability.csproj": {}
+    "X:\\My Drive\\Coding Exercises\\HackerRank\\Project Euler\\problem-100-arranged-probability\\problem-100-arranged-probability.csproj": {}
   },
   "projects": {
-    "x:\\My Drive\\Coding Exercises\\HackerRank\\Project Euler\\problem-100-arranged-probability\\problem-100-arranged-probability\\problem-100-arranged-probability.csproj": {
+    "X:\\My Drive\\Coding Exercises\\HackerRank\\Project Euler\\problem-100-arranged-probability\\problem-100-arranged-probability.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "x:\\My Drive\\Coding Exercises\\HackerRank\\Project Euler\\problem-100-arranged-probability\\problem-100-arranged-probability\\problem-100-arranged-probability.csproj",
+        "projectUniqueName": "X:\\My Drive\\Coding Exercises\\HackerRank\\Project Euler\\problem-100-arranged-probability\\problem-100-arranged-probability.csproj",
         "projectName": "problem-100-arranged-probability",
-        "projectPath": "x:\\My Drive\\Coding Exercises\\HackerRank\\Project Euler\\problem-100-arranged-probability\\problem-100-arranged-probability\\problem-100-arranged-probability.csproj",
+        "projectPath": "X:\\My Drive\\Coding Exercises\\HackerRank\\Project Euler\\problem-100-arranged-probability\\problem-100-arranged-probability.csproj",
         "packagesPath": "C:\\Users\\cyjac\\.nuget\\packages\\",
-        "outputPath": "x:\\My Drive\\Coding Exercises\\HackerRank\\Project Euler\\problem-100-arranged-probability\\problem-100-arranged-probability\\obj\\",
+        "outputPath": "X:\\My Drive\\Coding Exercises\\HackerRank\\Project Euler\\problem-100-arranged-probability\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\cyjac\\AppData\\Roaming\\NuGet\\NuGet.Config"

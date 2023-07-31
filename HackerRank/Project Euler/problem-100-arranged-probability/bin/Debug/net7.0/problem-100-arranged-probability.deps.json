@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "problem-100-arranged-probability/1.0.0": {
+        "runtime": {
+          "problem-100-arranged-probability.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "problem-100-arranged-probability/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
