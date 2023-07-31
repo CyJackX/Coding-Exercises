@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "problem-100-arranged-probability", "problem-100-arranged-probability\problem-100-arranged-probability.csproj", "{D5C534A2-9F81-4484-8DF4-5BDCD2E8E8F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "problem-100-arranged-probability", "..\problem-100-arranged-probability\problem-100-arranged-probability.csproj", "{B918DF1A-6271-44F1-87CA-4025F716ABA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +14,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D5C534A2-9F81-4484-8DF4-5BDCD2E8E8F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5C534A2-9F81-4484-8DF4-5BDCD2E8E8F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5C534A2-9F81-4484-8DF4-5BDCD2E8E8F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5C534A2-9F81-4484-8DF4-5BDCD2E8E8F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B918DF1A-6271-44F1-87CA-4025F716ABA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B918DF1A-6271-44F1-87CA-4025F716ABA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B918DF1A-6271-44F1-87CA-4025F716ABA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B918DF1A-6271-44F1-87CA-4025F716ABA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
