@@ -1,0 +1,19 @@
+def area(x1,y1,x2,y2,x3,y3):
+    return abs((x1*y2+x2*y3+x3*y1-y1*x2-y2*x3-y3*x1)/2)
+    
+def containsOrigin(x1,y1,x2,y2,x3,y3):
+    return area(x1,y1,x2,y2,x3,y3) == area(0,0,x2,y2,x3,y3) + area(x1,y1,0,0,x3,y3) + area(x1,y1,x2,y2,0,0)
+
+count = 0
+for _ in range(int(input())):
+    coordinates = [int(x) for x in input().split(' ')]
+    x1 = coordinates[0]
+    y1 = coordinates[1]
+    x2 = coordinates[2]
+    y2 = coordinates[3]
+    x3 = coordinates[4]
+    y3 = coordinates[5]
+    if containsOrigin(x1,y1,x2,y2,x3,y3):
+        count += 1
+
+print(count)
