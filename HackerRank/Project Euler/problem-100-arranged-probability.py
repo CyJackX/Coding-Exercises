@@ -84,7 +84,11 @@ https://brilliant.org/wiki/hensels-lemma/
 https://sites.millersville.edu/bikenaga/number-theory/prime-power-congruences/prime-power-congruences.html
 
 Quadratic Congruence Solver tested and completed...Still not enough, and one stray wrong answer somewhere as well...
+
+08/04/2023
+I thought there were no solutions for when P*Q is square...turns out that's not the case! It's more specific than that...
 '''
+import pstats
 from itertools import chain, combinations
 import cProfile
 from functools import reduce
@@ -92,15 +96,16 @@ from itertools import product
 from collections import Counter
 import math
 import random
+import itertools
 
-# Floating point errors from other version I think?
 
 def gcd(a, b):
     while b != 0:
         a, b = b, a % b
     return a
 
-def is_perfect_square(n):
+
+def is_square(n):
     root = round(n**.5)
     return root*root == n
     if n < 0:
@@ -123,6 +128,7 @@ def is_perfect_square(n):
 #     print(is_square(x))
 #     print(i)
 # exit()
+
 
 def gcdExtended(a, b):
     x0, x1, y0, y1 = 1, 0, 0, 1
@@ -149,23 +155,13 @@ def powerset(lst):
     # combinations(lst, r) generates all the possible combinations of length r
     return list(chain.from_iterable(combinations(lst, r) for r in range(len(lst)+1)))
 
+
 class FactoredNumber:
     """Creating a helper class to factor once and only once when finding all square divisors, etc."""
 
     def __init__(self, factors):
         self.primeCounts = Counter(factors)
 
-    def squareDivisors(self):
-        square_roots = []
-        for key in self.primeCounts.keys():
-            for _ in range(self.primeCounts[key] // 2):
-                square_roots.append(key)
-
-        square_roots = list(set(powerset(square_roots)))
-        square_roots = [FactoredNumber(square_root)
-                        for square_root in square_roots]
-        return square_roots
-    
     def squareroots_and_dividends(self):
         """
         Since evaluating quadratic solutions requires also dividing out square divisors, this helper function lets us get all the squareroots of those squares, and maintain the factoring of the dividend.
@@ -184,18 +180,17 @@ class FactoredNumber:
         # Create new sets of factors for every congruence
         square_divisor_root = []
         for roots in square_roots:
-            roots = FactoredNumber(roots)
+            rootsCount = Counter(roots)
 
             dividend = self.clone()
-            dividend.divideBy(roots)
-            dividend.divideBy(roots)
+            dividend.primeCounts = dividend.primeCounts - rootsCount - rootsCount
             dividend.primeCounts = +dividend.primeCounts
             if not dividend.primeCounts:
                 dividend.primeCounts.update([1])
 
-            divisor = roots.getValue()
+            divisor = reduce(lambda x, root: x*root, roots, 1)
 
-            square_divisor_root.append([divisor, dividend])            
+            square_divisor_root.append([divisor, dividend])
 
         return square_divisor_root
 
@@ -209,7 +204,7 @@ class FactoredNumber:
         clone = FactoredNumber([0])
         clone.primeCounts = self.primeCounts.copy()
         return clone
-    
+
     def divideBy(self, num2):
         self.primeCounts = self.primeCounts - num2.primeCounts
 
@@ -232,6 +227,7 @@ def legendre(a, p):
     if a**((p-1)//2) % p == 1:
         return 1
     return -1
+
 
 def tonelliShanks(n, prime):
     """
@@ -265,7 +261,8 @@ def tonelliShanks(n, prime):
         t = (t*b**2) % prime
         R = R*b % prime
 
-    return R, (-R) % prime    
+    return R, (-R) % prime
+
 
 def modSquareRoot(n, prime):
     """
@@ -276,7 +273,7 @@ def modSquareRoot(n, prime):
 
     if legendreSymbol == -1:
         raise ValueError("No Roots")
-    
+
     if legendreSymbol == 0:
         return [0]
 
@@ -291,41 +288,8 @@ def modSquareRoot(n, prime):
 
     if -root % prime != root:
         return [root, -root % prime]
-    
+
     return [root]
-
-
-def testModRootFunction():
-    """Testing Suite"""
-    while True:
-        # power = random.randint(1, 5)
-        prime = random.choice([2, 3, 5, 7, 11, 13, 17, 19, 23, 29])
-        num = random.randint(0, 100)
-        
-        try:
-            roots = modSquareRoot(num, prime)
-        except ValueError as e:            
-            if str(e) == 'No Roots':
-                print(
-                    f"Checking no solutions for {num} mod {prime}")
-                for root in range(prime):
-                    if ((root**2 - num) % prime == 0):
-                        raise ValueError("Root exists!")
-            else:
-                raise                
-        else:
-            print(f"Checking solutions for {num} mod {prime}")
-            for root in roots:
-                if ((root**2 - num) % prime != 0):
-                    raise ValueError("Root wrong!")
-                print(root," is a root.")
-            for root in range(prime):
-                    if ((root**2 - num) % prime == 0) and root not in roots:
-                        raise ValueError("Another root exists!")
-            print("No other roots.")
-            
-# testModRootFunction()
-# exit()
 
 
 def quadraticCongruenceSolver(A, B, C, prime, power):
@@ -336,35 +300,38 @@ def quadraticCongruenceSolver(A, B, C, prime, power):
     """
     def f(x):
         return A*x**2 + B*x + C
-    def df(x): #Derivative of function
+
+    def df(x):  # Derivative of function
         return 2*A*x + B
 
     # Root(s) mod prime
-    if prime == 2: 
-        roots = [x for x in range(2) if f(x) % 2 == 0] #Honestly seemed easiest to just do this
+    if prime == 2:
+        # Honestly seemed easiest to just do this
+        roots = [x for x in range(2) if f(x) % 2 == 0]
         if not roots:
             raise ValueError("No Roots")
     else:
-        #Otherwise, complete the square
+        # Otherwise, complete the square
         roots = modSquareRoot(B*B - 4*A*C, prime)
-        roots = [(-B + root)*modInverse(2*A,prime) % prime
-                for root in roots]
+        roots = [(-B + root)*modInverse(2*A, prime) % prime
+                 for root in roots]
 
     # Root(s) mod prime**power using Hensel's Lemma(s).
     if df(roots[0]) % prime != 0:
         # Basic Hensel's Lemma
         for _ in range(1, power):
-            roots = [(root - f(root)*modInverse(df(root), prime)) % prime**power for root in roots]
+            roots = [(root - f(root)*modInverse(df(root), prime)) %
+                     prime**power for root in roots]
     else:
-        # Stronger Hensel's Lemma        
+        # Stronger Hensel's Lemma
         for j in range(2, power + 1):
             nextRoots = []
             for root in roots:
                 if f(root) % prime**j == 0:
-                    #If so, add that root and all congruences to the roots.
-                    for i in range(root, prime**j, prime**(j-1)): 
-                        nextRoots.append(i)
-            
+                    # If so, add that root and all congruences to the roots.
+                    nextRoots.extend(i for i in range(
+                        root, prime**j, prime**(j-1)))
+
             if nextRoots:
                 roots = nextRoots
             else:
@@ -372,45 +339,6 @@ def quadraticCongruenceSolver(A, B, C, prime, power):
 
     return roots
 
-
-def testQuadraticCongruences():
-    while True:
-        while True:
-            A = random.randint(-500, 500)
-            B = random.randint(-500, 500)
-            C = random.randint(-500, 500)
-            power = random.randint(1, 10)
-            prime = random.choice([2, 3, 5])
-            if gcd(A,prime) == 1: #Edge case that is resolved by unimodular transformation in general solver...
-                break
-        # A,B,C,power,prime = -425,269,436,4,2
-        def f(x): #Function, helpful
-            return A*x**2 + B*x + C
-        try:
-            roots = quadraticCongruenceSolver(A, B, C, prime, power)
-        except ValueError as e:            
-            if str(e) == 'No Roots':
-                # print(f"Checking NO solutions for {A}x^2 + {B}x + {C} = 0 mod {prime}^{power}")
-                # for root in range(prime**power):
-                #     if (f(root) % prime**power == 0):
-                #         raise ValueError("Root exists!")
-                print("No solutions found")
-            else:
-                raise
-        else:
-            print(f"Checking solutions for {A}x^2 + {B}x + {C} = 0 mod {prime}^{power}")
-            if len(roots) > 2:
-                pass
-            for root in roots:
-                if (f(root) % prime**power != 0):
-                    raise ValueError("Root wrong!")
-                print(root,"is a root")
-            
-            print("exhausting all other numbers")
-            for root in range(prime**power):
-                if (f(root) % prime**power == 0) and root not in roots:
-                    raise ValueError("Another root exists!")
-            print("   success")
 
 def prime_factors(n):
     factors = []
@@ -432,23 +360,14 @@ def prime_factors(n):
 
 
 def chineseRemainder(integers, mods):
-    """
-    Array of integers, array of their mods
-    """
-    M = reduce(lambda x, y: x * y, mods, 1)
-    modGroup = [M//mod for mod in mods]
+    M = reduce(lambda x, y: x * y, mods)
+    modGroup = [M // mod for mod in mods]
+    inverses = [modInverse(mg, mod) for mg, mod in zip(modGroup, mods)]
+    answer = sum(n * inv * mg for n, inv,
+                 mg in zip(integers, inverses, modGroup))
+    return answer % M
 
-    inverses = []
-    for i in range(len(mods)):
-        inverses.append(modInverse(modGroup[i], mods[i]))
 
-    answer = 0
-    for i in range(len(mods)):
-        answer += integers[i] * inverses[i] * modGroup[i]
-
-    answer %= M
-    return answer
-            
 # testQuadraticCongruences()
 # exit()
 
@@ -456,10 +375,12 @@ def continued_fractions(D, remainder=0, denominator=1):
     """
     General quadratic continued fraction calculator, works for rationals as well
     """
-    sqrtD = D**.5
 
-    if is_perfect_square(D):
-        remainder += round(sqrtD)
+    if is_square(D):
+        remainder += round(D**.5)
+        g = gcd(remainder, denominator)
+        remainder //= g
+        denominator //=g
         D = 0
 
     # Correct form for algorithm
@@ -467,10 +388,12 @@ def continued_fractions(D, remainder=0, denominator=1):
         D *= denominator**2
         remainder *= abs(denominator)
         denominator *= abs(denominator)
+        
+    sqrtD = D**.5
 
     sequence_value = math.floor(((sqrtD) + remainder)//denominator)
 
-    continued_fraction_list = [sequence_value]
+    cont_frac_list = [sequence_value]
 
     seen = dict()  # Use a dictionary keys to store the indexes for faster lookups for a repeated state
 
@@ -479,8 +402,8 @@ def continued_fractions(D, remainder=0, denominator=1):
         # Continued Fraction Logic
         remainder = denominator * sequence_value - remainder
         if D - remainder**2 == 0:
-            #If it's a rational number
-            return [continued_fraction_list, []]
+            # If it's a rational number
+            return [cont_frac_list, []]
         denominator = (D - remainder**2) // denominator
         sequence_value = math.floor((remainder + sqrtD) // denominator)
 
@@ -489,36 +412,39 @@ def continued_fractions(D, remainder=0, denominator=1):
         if prevState in seen.keys():
             # Return two arrays, the first with non-repeating, the second the repetend.
             repetendStart = seen[prevState]
-            return [continued_fraction_list[0:repetendStart], continued_fraction_list[repetendStart:]]
+            return [cont_frac_list[0:repetendStart], cont_frac_list[repetendStart:]]
 
         # Store values
-        continued_fraction_list.append(sequence_value)
-        seen[(sequence_value, remainder, denominator)] = index
+        cont_frac_list.append(sequence_value)
+        seen[prevState] = index
         index += 1
 
+# print(continued_fractions(16,5,2))
+# exit()
+
 # Returns convergents if fractions entered.
+
 def convergentFunc(continued_fractions):
-    non_periodic = continued_fractions[0]
-    periodic = continued_fractions[1]
-    
-    non_periodic_len = len(non_periodic)
-    periodic_len = len(periodic)
+    non_periodic, periodic = continued_fractions
 
     cur_num, cur_denom = non_periodic[0], 1
     prev_num, prev_denom = 1, 0
 
-    i = 1
-    while True:
-        yield cur_num, cur_denom
-        
-        coefficient = non_periodic[i] if i < non_periodic_len else periodic[(i - non_periodic_len) % periodic_len]
+    yield cur_num, cur_denom  # Yield the initial values
 
+    for coefficient in non_periodic[1:]:
         next_num = cur_num * coefficient + prev_num
         next_denom = cur_denom * coefficient + prev_denom
 
         prev_num, prev_denom, cur_num, cur_denom = cur_num, cur_denom, next_num, next_denom
+        yield cur_num, cur_denom
 
-        i += 1
+    for coefficient in itertools.cycle(periodic):
+        next_num = cur_num * coefficient + prev_num
+        next_denom = cur_denom * coefficient + prev_denom
+
+        prev_num, prev_denom, cur_num, cur_denom = cur_num, cur_denom, next_num, next_denom
+        yield cur_num, cur_denom
 
 
 # Discovered YIELD, which can probably save a boatload of memory by doing convergences lone at a time, without needing to save states manually...
@@ -562,9 +488,7 @@ def convergentFunc(continued_fractions):
 def solutionsABC(A, B, C, N):
     """
     Delivers solutions to Ax^2 +Bxy + Cy^2 = N
-    """
-
-    D = B*B - 4*A*C
+    """    
 
     solutions = set()
     primePowerMemo = dict()
@@ -583,11 +507,11 @@ def solutionsABC(A, B, C, N):
         factorSolutions = dict()
         try:
             for factor, power in factors.primeCounts.items():
-                
+
                 if factor == 1:
                     factorSolutions[1] = [0]
                     continue
-                
+
                 prime_power = factor**power
 
                 if prime_power in primePowerMemo:
@@ -596,13 +520,14 @@ def solutionsABC(A, B, C, N):
                     else:
                         factorSolutions[prime_power] = primePowerMemo[prime_power]
                 else:
-                    factorSolutions[prime_power] = quadraticCongruenceSolver(A,B,C,factor,power)
+                    factorSolutions[prime_power] = quadraticCongruenceSolver(
+                        A, B, C, factor, power)
                     primePowerMemo[prime_power] = factorSolutions[prime_power]
         except ValueError as e:
             # If there are no roots discovered, continue to the next square divisor of N
             if str(e) == 'No Roots':
-                 primePowerMemo[prime_power] = None
-                 continue
+                primePowerMemo[prime_power] = None
+                continue
             raise
 
         # Combine all permutations of solutions for Chinese Remainder
@@ -612,16 +537,17 @@ def solutionsABC(A, B, C, N):
         for integers in chineseIntegers:
             modSolutions.add(chineseRemainder(integers, chineseMods))
 
-        # The convergences of the continued fraction expansion of each solution to the quadratic congruence should potentially be solutions to the equation.
+        # The convergences of the continued fraction expansion of each solution to the quadratic congruence should potentially be solutions to the original equation.
+        D = B*B - 4*A*C
         modulus = N // squareIdx**2
+        R = A*modulus
         for T in modSolutions:
+            P = (A*T**2 + B*T + C)//modulus
+            Q = -(2*A*T+B)
+            if gcd(gcd(P, Q), R) > 1:
+                continue
             for sign in [1, -1]:
-                P = (A*T**2 + B*T + C)//modulus
-                Q = -(2*A*T+B)
-                R = A*modulus
-                if gcd(gcd(P, Q), R) > 1:
-                    continue
-                
+
                 cfs = continued_fractions(D, Q*sign, 2*R*sign)
                 convergents = convergentFunc(cfs)
 
@@ -632,9 +558,9 @@ def solutionsABC(A, B, C, N):
 
                 for _ in range(len(cfs[0]) + period):
 
-                # Using this convergent iterator is much nicer than evaluating the whole continued fraction;
-                # convergents = convergentFunc(D, Q*sign, 2*R*sign)
-                # while True:           
+                    # Using this convergent iterator is much nicer than evaluating the whole continued fraction;
+                    # convergents = convergentFunc(D, Q*sign, 2*R*sign)
+                    # while True:
                     [z, y] = next(convergents)
 
                     # if y > 2**120: #A heuristic to avoid calculating the entire continued fractions to find the period...?
@@ -662,15 +588,14 @@ def recurrenceFunc(A, B, C, D, E, F):
 
     # find r and s, where r^2 +Brs + ACs^2 == 1
     rsSolutions = solutionsABC(1, B, A*C, 1)
-    
+
     # Only need the first positive solution?, because all others can be derived from it?
     rsSolutions = [x for x in rsSolutions if x[0] > 0 and x[1] > 0]
 
-    while not rsSolutions:#This is for the edge cases where PQ is square but the roots found can work?
-        yield None
+    if not rsSolutions:  # This is for the edge cases where PQ is square but the roots found can work?
+        return None
 
-    rsSolutions.sort()
-    r,s = rsSolutions[0]
+    r, s = rsSolutions[0]
 
     denom = 4*A*C - B*B
     flipSigns = True
@@ -687,7 +612,7 @@ def recurrenceFunc(A, B, C, D, E, F):
         if Knum % denom == 0 and Lnum % denom == 0:
             K = Knum // denom
             L = Lnum // denom + D*s
-            yield recurrence
+            return recurrence
 
         # Try -r,-s first, then go to next (r,s)
         r = -r
@@ -718,9 +643,9 @@ def genericQuadSolve(a, b, c, d, e, f):
     RHS = -D*(a*e**2 - b*e*d + c*d**2 + f*D)
 
     # Make coefficient of X^2 and right hand side co-prime using unimodular transformation
-    # X = mU +(m-1)V, Y = U + V    
+    # X = mU +(m-1)V, Y = U + V
     m = 1
-    while gcd(a*m**2 + c, RHS) != 1: #Can be optimized
+    while gcd(a*m**2 + c, RHS) != 1:  # Can be optimized
         m += 1
 
     # Convert to AU^2 + BUV + CV^2 = RHS
@@ -742,55 +667,69 @@ def genericQuadSolve(a, b, c, d, e, f):
 
     return xysolutions
 
+def hasSolution(P, Q):
+    D = P * Q
+    if not is_square(D):
+        return True
+    
+    if P == 1 and is_square(Q) and Q % 4 == 0 and not math.log2(Q).is_integer():
+        return True
+    
+    return False
 
 # Final algorithm using info gleaned from alperton's site for solving QB^2 - QB -PT^2 +PT = 0
 def minDisk2(P, Q, min_val, PQdictionary):
+        
     g = gcd(P, Q)
     P //= g
     Q //= g
-    # if is_perfect_square(Q*P): 
-    #     raise ValueError("No solution") # P,Q = 1,36 has a solution! argh!
-    
+
+    if not hasSolution(P,Q):
+        raise ValueError("No solution")  # P,Q = 1,36 has a solution! argh!
+
     #  Memoization for identical cases.
-    if (P,Q) in PQdictionary:
-        xysolutions, recursiveFunctions = PQdictionary[(P,Q)]
+    if (P, Q) in PQdictionary:
+        xysolutions, recursiveFunc = PQdictionary[(P, Q)]
     else:
         xysolutions = genericQuadSolve(Q, 0, -P, -Q, P, 0)
-        recursiveIterator = recurrenceFunc(Q, 0, -P, -Q, P, 0)
-        recursiveFunctions = [next(recursiveIterator)] #vestige of multiple recurrence functions
-        PQdictionary[(P,Q)] = [xysolutions,recursiveFunctions]
-
+        recursiveFunc = recurrenceFunc(Q, 0, -P, -Q, P, 0)
+        # recursiveFunctions = [next(recursiveIterator)] #vestige of multiple recurrence functions
+        PQdictionary[(P, Q)] = [xysolutions, recursiveFunc]
 
     B, T = 0, float('inf')
-    
-    for root in xysolutions:
-        solution = root
-        for recursiveFunc in recursiveFunctions: #vestige of multiple recurrence functions
 
-            while abs(solution[1]) <= min_val and recursiveFunc is not None:
+    for solution in xysolutions:
+        if recursiveFunc != None:
+            while abs(solution[1]) <= min_val:
                 solution = recursiveFunc(solution)
 
-            if solution[1] < T and solution[0] > 0 and solution[1] > 0 and solution[0] != solution[1]:
-                (B, T) = solution
+        if min_val < solution[1] < T and solution[0] > 0:
+            (B, T) = solution
 
     if B == 0:
         raise ValueError("No solution")
-    
+
     return (B, T)
 
-def minDisksBrute(P, Q, min_val, solution = 10000000):
-    print("Double-Checking...")
 
-    if solution - min_val < 10000000:
-        for T in range(min_val, solution + 1):            
-            B = round(((4*P*(T-1)*T + Q)**.5 + Q**.5)/(2*Q**.5))
-            if B*(B-1)*Q == T*(T-1)*P:
-                return [B, T]
-        print("No other solutions found.")
-    else:
-        print("Too difficult to verify")    
-    
+def minDisksBrute(P, Q, min_val, solution=100000):
+    # print("Double-Checking...")
+
+    count = 0
+    for T in range(min_val, solution + 1):
+        count += 1
+        if count > 100000:
+            break
+
+        B = round(((4*P*(T-1)*T + Q)**.5 + Q**.5)/(2*Q**.5))
+        if B*(B-1)*Q == T*(T-1)*P:
+            return [B, T]
+        # print("No other solutions found.")
+    # else:
+        # print("Too difficult to verify")
+
     return None
+
 
 def generate_random_inputs():
     PQmin = 10**7
@@ -801,31 +740,31 @@ def generate_random_inputs():
     return P, Q, D
 
 
-def test_minDisks(Qmin = 2, testcases = 3, randomize = False, validate = False, log = False):
+def test_minDisks(Qmin=2, testcases=3, randomize=False, validate=False, log=False):
     PQdictionary = dict()
     count = 0
     for Q in range(Qmin, 10**7):
         for P in range(1, Q, 1):
-            if not is_perfect_square(P*Q):
-                continue
+
             count += 1
             if count > testcases:
                 return
-            min_val = 2 # random.randint(2,10000)
-            
+            min_val = 200  # random.randint(2,10000)
+
             if randomize:
                 P, Q, min_val = generate_random_inputs()
-            
-            # P,Q = 1,36
+
+            # P,Q = 36, 36**2
             try:
                 if log:
                     print(f"\n\tP = {P}, Q = {Q}, min_val={min_val}.")
+                    print(P*Q, prime_factors(P*Q), prime_factors(P),prime_factors(Q))
                 [B, T] = minDisk2(P, Q, min_val, PQdictionary)
             except ValueError as e:
                 if str(e) == "No solution":
-                    if log:
-                        print("Result: No solution")
-                    
+                    # if log:
+                        # print("Result: No solution")
+
                     if validate:
                         if minDisksBrute(P, Q, min_val) != None:
                             raise ValueError("Solution actually exists!")
@@ -833,16 +772,20 @@ def test_minDisks(Qmin = 2, testcases = 3, randomize = False, validate = False, 
             else:
                 if B*(B-1)*Q == T*(T-1)*P:
                     if log:
+                        # print(f"\n\tP = {P}, Q = {Q}, min_val={min_val}.")
+                        # print(P//gcd(P,Q), Q//gcd(P,Q))
+                        # print(P*Q, prime_factors(P*Q), prime_factors(P),prime_factors(Q))
                         print(f"Result: {B},{T}")
                 else:
                     raise ValueError("Wrong Answer")
-                
+
                 if validate:
                     check = minDisksBrute(P, Q, min_val, T)
                     if check != None and [B, T] != check:
-                        print(check," found!")
+                        print(check, " found!")
                         raise ValueError("Not a minimum!")
                     print("Confirmed")
+
 
 def testCase(P, Q, min_val):
     # D = P*Q
@@ -855,12 +798,11 @@ def testCase(P, Q, min_val):
 
     print(f"P={P}, Q={Q}, min_val={min_val}. Result: {B},{T}, {B2},{T2}")
 
-import pstats
 
 profiler = cProfile.Profile()
 profiler.enable()
 # testCase(12,99, 2)
-test_minDisks(2,2000,False, False, True)
+test_minDisks(2, 2000, False, False, False)
 # func = recurrenceFunc(17,0,-5,-17,5,0)
 # for _ in range(1000):
 # next(func)
@@ -871,8 +813,9 @@ test_minDisks(2,2000,False, False, True)
 #     solve_pells(D)
 #     solutionsABC(1,0,-D,1)
 profiler.disable()
-ps = pstats.Stats(profiler).strip_dirs().sort_stats('tottime')  # Sorting by cumulative time
-ps.print_stats(10)  # Print only the top 10 lines
+ps = pstats.Stats(profiler).strip_dirs().sort_stats(
+    'tottime')  # Sorting by cumulative time
+ps.print_stats(15)  # Print only the top 10 lines
 # testCase(56,59,2)
 
 # inputs = []
@@ -889,9 +832,10 @@ ps.print_stats(10)  # Print only the top 10 lines
 #     except ValueError as e:
 #         if str(e) == "No solution":
 #             print("No solution")
-#             continue  
+#             continue
 #     else:
 #         print(str(answer[0]) + " " + str(answer[1]))
+
 
 def next_solution(pell_solution, cur_solution):
     x1 = pell_solution[0]
@@ -909,7 +853,7 @@ def solve_general_pells_brute(D, K, min=0):
     x = 0
     y = min
     square = 0
-    while square == 0 or not is_perfect_square(square):
+    while square == 0 or not is_square(square):
         y += 1
         square = K + D * y * y
     x = round(math.sqrt(K + D * y * y))
@@ -967,7 +911,7 @@ def minDisks(P, Q, min_val):
     P //= g
     Q //= g
     D = Q * P
-    if is_perfect_square(D):
+    if is_square(D):
         return [None, None]
 
     K = Q * (Q - P)
@@ -1110,7 +1054,6 @@ def next_convergent(prevConvergent, currentConvergent, continued_fractions, next
 #     return xySolutions
 
 
-
 # def primePowers(n):
 #     """
 #     Factor, but grouping primes
@@ -1138,3 +1081,77 @@ def next_convergent(prevConvergent, currentConvergent, continued_fractions, next
 
 #     return factors
 
+def testModRootFunction():
+    """Testing Suite"""
+    while True:
+        # power = random.randint(1, 5)
+        prime = random.choice([2, 3, 5, 7, 11, 13, 17, 19, 23, 29])
+        num = random.randint(0, 100)
+
+        try:
+            roots = modSquareRoot(num, prime)
+        except ValueError as e:
+            if str(e) == 'No Roots':
+                print(
+                    f"Checking no solutions for {num} mod {prime}")
+                for root in range(prime):
+                    if ((root**2 - num) % prime == 0):
+                        raise ValueError("Root exists!")
+            else:
+                raise
+        else:
+            print(f"Checking solutions for {num} mod {prime}")
+            for root in roots:
+                if ((root**2 - num) % prime != 0):
+                    raise ValueError("Root wrong!")
+                print(root, " is a root.")
+            for root in range(prime):
+                if ((root**2 - num) % prime == 0) and root not in roots:
+                    raise ValueError("Another root exists!")
+            print("No other roots.")
+
+# testModRootFunction()
+# exit()
+
+
+def testQuadraticCongruences():
+    while True:
+        while True:
+            A = random.randint(-500, 500)
+            B = random.randint(-500, 500)
+            C = random.randint(-500, 500)
+            power = random.randint(1, 10)
+            prime = random.choice([2, 3, 5])
+            # Edge case that is resolved by unimodular transformation in general solver...
+            if gcd(A, prime) == 1:
+                break
+        # A,B,C,power,prime = -425,269,436,4,2
+
+        def f(x):  # Function, helpful
+            return A*x**2 + B*x + C
+        try:
+            roots = quadraticCongruenceSolver(A, B, C, prime, power)
+        except ValueError as e:
+            if str(e) == 'No Roots':
+                # print(f"Checking NO solutions for {A}x^2 + {B}x + {C} = 0 mod {prime}^{power}")
+                # for root in range(prime**power):
+                #     if (f(root) % prime**power == 0):
+                #         raise ValueError("Root exists!")
+                print("No solutions found")
+            else:
+                raise
+        else:
+            print(
+                f"Checking solutions for {A}x^2 + {B}x + {C} = 0 mod {prime}^{power}")
+            if len(roots) > 2:
+                pass
+            for root in roots:
+                if (f(root) % prime**power != 0):
+                    raise ValueError("Root wrong!")
+                print(root, "is a root")
+
+            print("exhausting all other numbers")
+            for root in range(prime**power):
+                if (f(root) % prime**power == 0) and root not in roots:
+                    raise ValueError("Another root exists!")
+            print("   success")
