@@ -374,9 +374,6 @@ def chineseRemainder(integers, mods):
                  mg in zip(integers, inverses, modGroup))
     return answer % M
 
-# testQuadraticCongruences()
-# exit()
-
 
 def continued_fractions(D, remainder=0, denominator=1):
     """
@@ -387,7 +384,7 @@ def continued_fractions(D, remainder=0, denominator=1):
         remainder += round(D**.5)
         g = gcd(remainder, denominator)
         remainder //= g
-        denominator //=g
+        denominator //= g
         D = 0
 
     # Correct form for algorithm
@@ -398,7 +395,7 @@ def continued_fractions(D, remainder=0, denominator=1):
 
     sqrtD = D**.5
 
-    sequence_value = int(((sqrtD) + remainder)//denominator)
+    sequence_value = int(((sqrtD) + remainder)/denominator)
 
     cont_frac_list = [sequence_value]
 
@@ -412,7 +409,7 @@ def continued_fractions(D, remainder=0, denominator=1):
             # If it's a rational number
             return [cont_frac_list, []]
         denominator = (D - remainder**2) // denominator
-        sequence_value = int((remainder + sqrtD) // denominator)
+        sequence_value = int((remainder + sqrtD) / denominator)
 
         # Repetition Check
         prevState = (sequence_value, remainder, denominator)
@@ -451,7 +448,6 @@ def convergentFunc(continued_fractions):
 
         prev_num, prev_denom, cur_num, cur_denom = cur_num, cur_denom, next_num, next_denom
         yield cur_num, cur_denom
-
 
 
 def solutionsABC(A, B, C, N):
@@ -624,7 +620,7 @@ def genericQuadSolve(a, b, c, d, e, f):
     B = 2*(a*m*(m-1) + c)
     C = a*(m-1)**2 + c
 
-    # Somehow figured that RHS is only effective minus the factors of (D/2)**2, so scale them down
+    # Somehow figured that RHS is only effective minus the factors of (D/2)**2, so scale them down;
     UVsolutions = solutionsABC(A, B, C, RHS//(D//2)**2)
 
     xysolutions = []
@@ -651,6 +647,8 @@ def squareEdgeCase(P, Q):
     return P == 1 and is_square(Q) and Q % 4 == 0 and Q % 16 != 0 and not math.log2(Q).is_integer()
 
 # Final algorithm using info gleaned from alperton's site for solving QB^2 - QB -PT^2 +PT = 0
+
+
 def minDisk2(P, Q, min_val, PQdictionary):
 
     g = gcd(P, Q)
@@ -663,48 +661,27 @@ def minDisk2(P, Q, min_val, PQdictionary):
     #  Memoization for identical cases.
     key = (P, Q)
     if key in PQdictionary:
-        if PQdictionary[key] != None:
-            xysolutions, recursiveFunc = PQdictionary[key]
-        else:
+        if PQdictionary[key] == None:
             raise ValueError("No solution")
+        xysolutions, recursiveFunc = PQdictionary[key]
     else:
-        if not is_square(P*Q):
-            xysolutions = []
-            xysolutions = genericQuadSolve(Q, 0, -P, -Q, P, 0)
-            xysolutions.extend([(1,1),(0,1),(1,0),(0,0)])
-
-            # Really bizarre heuristic/edge-case I don't understand, but if it allows us to skip solving for the roots manually...
-            # prime = max(prime_factors(Q))
-            # for m in range(1,100):
-            #     for i in range(2):
-            #         T = m*prime + i
-            #         B = round(((4*P*(T-1)*T + Q)**.5 + Q**.5)/(2*Q**.5))
-            #         if B*(B-1)*Q == T*(T-1)*P:
-            #             xysolutions.append((B,T))
-            #             break
-
-            recursiveFunc = recurrenceFunc(Q, 0, -P, -Q, P, 0)
-        elif squareEdgeCase(P, Q):
-            # Edge case(s) where P*Q being square HAS a solution
-            T = Q//4
-            B = round(((4*P*(T-1)*T + Q)**.5 + Q**.5)/(2*Q**.5))
-            xysolutions = [(B, T)]
+        xysolutions = genericQuadSolve(Q, 0, -P, -Q, P, 0)
+        if is_square(P*Q):
             recursiveFunc = None
         else:
-            PQdictionary[key] = None
-            raise ValueError("No solution")
+            recursiveFunc = recurrenceFunc(Q, 0, -P, -Q, P, 0)
 
         PQdictionary[key] = [xysolutions, recursiveFunc]
 
     B, T = 0, float('inf')
-    seen = set()
+    # seen = set() #Didn't really help tbh
     for solution in xysolutions:
         if recursiveFunc != None:
             while abs(solution[1]) <= min_val:
                 solution = recursiveFunc(solution)
-                if solution in seen:
-                    break
-                seen.update([solution])
+                # if solution in seen:
+                #     break
+                # seen.update([solution])
 
         if min_val < solution[1] < T and solution[0] > 0:
             (B, T) = solution
@@ -762,8 +739,8 @@ def test_minDisks(Qmin=2, testcases=3, randomize=False, validate=False, log=Fals
             try:
                 if log:
                     print(f"\n\tP = {P}, Q = {Q}, min_val={min_val}.")
-                    print(P*Q, prime_factors(P*Q),
-                          prime_factors(P), prime_factors(Q))
+                    # print(P*Q, prime_factors(P*Q),
+                    #       prime_factors(P), prime_factors(Q))
                 [B, T] = minDisk2(P, Q, min_val, PQdictionary)
             except ValueError as e:
                 if str(e) == "No solution":
@@ -827,7 +804,7 @@ def testCase(P, Q, min_val):
 profiler = cProfile.Profile()
 profiler.enable()
 # testCase(12,99, 2)
-test_minDisks(2, 3000, False, False, False)
+test_minDisks(2, 2000, False, False, False)
 # func = recurrenceFunc(17,0,-5,-17,5,0)
 # for _ in range(1000):
 # next(func)
@@ -860,10 +837,12 @@ ps.print_stats(15)  # Print only the top 10 lines
 #             continue
 #     else:
 #         print(str(answer[0]) + " " + str(answer[1]))
+
+
 class Deprecated:
-#     Discovered YIELD, which can probably save a boatload of memory by doing convergences lone at a time, without needing to save states manually...
-# All my convergents and continued fractions at once!
-# (remainder + sqrt(D))/denominator
+    #     Discovered YIELD, which can probably save a boatload of memory by doing convergences lone at a time, without needing to save states manually...
+    # All my convergents and continued fractions at once!
+    # (remainder + sqrt(D))/denominator
     def convergentFunc(D, remainder=0, denominator=1):
 
         # To accommodate rational numbers, squares
@@ -898,6 +877,7 @@ class Deprecated:
                 continuedFraction + prev_num, cur_num
             cur_denom, prev_denom = cur_denom * \
                 continuedFraction + prev_denom, cur_denom
+
     def next_solution(pell_solution, cur_solution):
         x1 = pell_solution[0]
         y1 = pell_solution[1]
@@ -907,7 +887,6 @@ class Deprecated:
         D = (x1 * x1 - 1) // (y1 * y1)
 
         return (x1 * xk + D * y1 * yk, x1 * yk + y1 * xk)
-
 
     def solve_general_pells_brute(D, K, min=0):
 
@@ -921,7 +900,6 @@ class Deprecated:
 
         return [(x, y), (-x, -y), [x, -y], [-x, y]]
 
-
     def solve_pells(D):
 
         cfs = continued_fractions(D)
@@ -934,7 +912,6 @@ class Deprecated:
             y = convergent[1]
 
         return (x, y)
-
 
     def chakravala(D):
         b = 1
@@ -965,7 +942,6 @@ class Deprecated:
             a, b, k = (a*m + D*b)//abs(k), (a+b*m)//abs(k), (m*m - D)//k
 
         return [a, b]
-
 
     def minDisks(P, Q, min_val):
         g = gcd(P, Q)
@@ -1064,7 +1040,8 @@ class Deprecated:
                 # Get all solutions
                 modFSolutions = []
                 for integers in chineseIntegers:
-                    modFSolutions.append(chineseRemainder(integers, chineseMods))
+                    modFSolutions.append(
+                        chineseRemainder(integers, chineseMods))
 
                 # Some Transformations I don't quite understand
                 # But this is for solving P_Y2 + Q_Yk + R_ k2 = 1 (Different from P/Q in the main problem)
@@ -1111,7 +1088,6 @@ class Deprecated:
         xySolutions = list(set([tuple(x) for x in xySolutions]))
 
         return xySolutions
-
 
     def primePowers(n):
         """
