@@ -1,0 +1,161 @@
+"""
+Seems to me that this is fully generating a matrix polynomial solver from points?
+-
+Just a huge exercise in eliminating redundancies from a bunch of matrix operations...
+-
+Scratch that, it needs Horner's method.
+-
+Overall much more simple and elegant than I'd thought.  I would've bashed my brains against matrices if it weren't for a hint I saw, thankfully...
+"""
+
+
+def horner(coefficients, x):
+    sum_ = 0
+    for coefficient in coefficients:
+        sum_ = (sum_*x + coefficient) % (10**9 + 7)
+    
+    return sum_
+
+# def gen_powers_of_x(x):
+#     return [[] for i in range(1,x+1)]
+
+# mtx1 = [[3,0,2],[2,0,-2],[0,1,1]]
+# for i in range(1,10):
+#     mtx = mtxinverse(vandermonde(i))
+#     # mtxScale(mtx,1/(i))
+#     print(i)
+#     printmtx(mtx)
+# printmtx(mtxmultiply(vandermonde(3),mtxinverse(vandermonde(3))))
+# print(mtxmultiply([[1,2,3]],[[4],[5],[6]]))
+# print(identity(3))
+# print(determinant([[6,1,1],[4,-2,5],[2,8,7]]))
+# printmtx(vandermonde(5))
+# N = int(input())
+# A = [int(x) for x in input().split(' ')]
+import random
+import cProfile
+import pstats
+
+# N = 3
+# A = [0,0,0,1]
+N = 5000
+A = []
+for i in range(N+1):
+    A.append(random.randint(0,2**31))
+
+profiler = cProfile.Profile()
+profiler.enable()
+
+A.reverse()
+prevTerms = []
+answers = []
+for x in range(1, len(A)):
+    newTerms = [horner(A,x)]
+    for i in range(len(prevTerms)):
+        newTerms.append(newTerms[i] - prevTerms[i])
+    print(sum(newTerms) % (10**9 + 7), end = " ")
+    prevTerms = newTerms
+
+
+# answers = []
+# for i in range(N):
+#     FIT = 0
+#     for j in range(i+1):
+#         FIT += 
+#     FIT %= 10**9 + 7
+#     print(FIT, end = " ")
+
+
+profiler.disable()
+print()
+ps = pstats.Stats(profiler).strip_dirs().sort_stats(
+    'tottime')  # Sorting by cumulative time
+ps.print_stats(15)
+
+# Deprecated
+def vandermonde(x):
+    return [[pow(xi+1,j,10**9+7) for j in range(x)] for xi in range(x)]
+
+def Pterms(A):
+    terms = []
+    A.reverse()
+    for x in range(1,len(A)):        
+        terms.append(horner(A,x))
+    return terms
+
+def identity(n):
+    return [[1 if j == xi else 0 for j in range(n)] for xi in range(n)]
+
+def printmtx(mtx):
+    for row in mtx:
+        print(row)
+
+def minormtx(mtx, row, col):
+    minor = mtx[0:row] + mtx[row + 1:]
+    for row in range(len(minor)):
+        minor[row] = minor[row][0:col] + minor[row][col + 1:]
+    return minor
+
+def determinant(mtx):
+    if len(mtx) == 1:
+        return mtx[0][0]
+    
+    det = 0
+    for col in range(len(mtx)):
+        minor = minormtx(mtx,0,col)
+        det += mtx[0][col]*determinant(minor)*(-1)**col
+
+    return det
+
+def mtxmultiply(mtx1, mtx2):
+    if len(mtx1[0]) != len(mtx2):
+        raise ValueError("Number of columns of mtx1 must match number of rows of mtx2 for multiplication.")
+
+    # Initialize the result matrix with zeros
+    mtx3 = [[0] * len(mtx2[0]) for _ in range(len(mtx1))]
+    
+    for row in range(len(mtx1)):
+        for col in range(len(mtx2[0])):
+            for k in range(len(mtx2)):
+                mtx3[row][col] += mtx1[row][k] * mtx2[k][col]
+    return mtx3
+
+def mtxinverse(mtx):
+    n = len(mtx)
+    if n == 1:
+        return [[1/mtx[0][0]]]
+
+    mtxminors = [[0] * n for _ in range(n)]
+
+    #mtx of minors, change signs
+    for i in range(n):
+        for j in range(n):
+            mtxminors[i][j] = determinant(minormtx(mtx,i,j))*(-1)**i*(-1)**j
+
+    det = sum([mtx[0][j]*mtxminors[0][j] for j in range(n)])
+
+    # Adjugate/Adjoint, determinant
+    for i in range(n):
+        for j in range(i, n):
+            if j == i:
+                mtxminors[i][j] /= det
+            else: 
+                mtxminors[i][j],mtxminors[j][i] = mtxminors[j][i]/det,mtxminors[i][j]/det
+    
+    return mtxminors
+def mtxScale(mtx, scale):
+    for i in range(len(mtx)):
+        for j in range(len(mtx[i])):
+            mtx[i][j] *= scale
+
+def p(x, coefficients):
+        sum = 0
+        for j in range(len(coefficients)):
+            sum += coefficients[j][0]*pow(x,j,10**9 + 7)
+        return round(sum) % (10**9 + 7)
+
+def nextTerm(terms):
+    if len(terms) == 1:
+        return terms[0]
+
+    return terms[-1] + nextTerm([terms[i] - terms[i-1] for i in range(1, len(terms))])
