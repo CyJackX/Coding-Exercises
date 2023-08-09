@@ -1,0 +1,33 @@
+"""
+Interesting problem; the whole "Set" up doesn't matter in Hackerrank's version.  This algorithm just took some charting out on paper to see where things were being done redundantly.  Went from O(n^2) to O(n)
+"""
+import cProfile
+import pstats
+profiler = cProfile.Profile()
+profiler.enable()
+
+n = 10**5  # int(input())
+terms = [1]
+runningSum = 0
+mod = 715827881
+
+for i in range(n -1):
+    if i % 2 == 0 and i > 1:
+        runningSum -= terms[i//2 - 1]
+    runningSum += terms[i]
+    runningSum %= mod
+    terms.append(runningSum)
+# print(terms)
+
+terms.reverse()
+
+sum = 0
+for elem in terms:
+    sum = (sum + elem) % mod
+    print(sum, end=" ")
+
+profiler.disable()
+print()
+ps = pstats.Stats(profiler).strip_dirs().sort_stats(
+    'tottime')  # Sorting by cumulative time
+ps.print_stats(15)
