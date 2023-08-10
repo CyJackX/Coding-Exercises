@@ -1,0 +1,126 @@
+from itertools import chain, combinations,permutations
+
+
+def checkCondition1(arr):
+    for size in range(2, len(arr)//2 + 1):
+        subsets = list(combinations(arr,size))
+        summedSets = set([sum(x) for x in subsets])
+        if len(summedSets) != len(subsets):
+            return False
+
+    return True
+
+def checkCondition1(arr):
+    """
+    Check that no two n-sized subsets have equal sums.
+    Couldn't figure out the index-less version so just built it in, honestly cleaner.
+    """
+    runningSums = enumerate(arr)
+    n = len(arr)
+    for _ in range(len(arr)//2 - 1):
+        newSumsWithIndex = []
+        for prevIdx, prevSum in runningSums:
+            for i in range(prevIdx + 1, n):
+                newSum = prevSum + arr[i]
+                newSumsWithIndex.append((i,newSum))
+        
+        sumsOnly = [x[1] for x in newSumsWithIndex]
+        if len(sumsOnly) != len(set(sumsOnly)): #Could maybe find a way to check along the way instead of at the end, but this is clean.
+            return False
+        
+        runningSums = newSumsWithIndex
+
+    return True
+
+def checkCondition2(arr):
+    """
+    Take a sorted array and check that no smaller subset can sum more than any larger subset.
+    """
+    leftIndex = 1
+    rightIndex = len(arr) - 1
+    sumLeft = sum(arr[0:2])
+    sumRight = arr[rightIndex]
+    while leftIndex <= rightIndex:
+        # Theoretically, if the "largest smaller" subset isn't bigger than the "smallest larger" subset, no other subsets will be.  Check for all possible sizes.
+        if sumLeft <= sumRight:
+            return False
+        leftIndex += 1
+        rightIndex -= 1
+        sumLeft += arr[leftIndex]
+        sumRight += arr[rightIndex]
+    return True
+
+def specialSumCheck(arr):
+
+    for sets in arr:
+        setB,setC = sets
+        if len(setC) > len(setB):
+            setC,setB = setB,setC
+            
+        sumC = sum(setC)
+        sumB = sum(setB)
+        
+        if sumC == sumB:
+            print(sets)
+        
+        if len(setB) > len(setC) and sumB <= sumC:
+            print(sets)
+
+    return True
+
+# for T in range(int(input())):
+#     n = int(input())
+#     arr = [int(x) for x in input().split(' ')]
+# inputs = [[81,88,75,42,87,84,86,65],[157,150,164,119,79,159,161,139,158],[1038,1188,1255,1184,594,890,1173,1151,1186,1203,1187,1195]]
+with open('./HackerRank/Project Euler/0105_sets.txt', 'r') as file:
+    inputs = file.read().split('\n')
+    inputs = [[int(x) for x in row.split(",")] for row in inputs]
+import cProfile
+import pstats
+profiler = cProfile.Profile()
+profiler.enable()
+sums = 0
+for arr in inputs:
+    arr.sort()
+    if checkCondition2(arr) and checkCondition1(arr):
+        print("YES")
+        sums += sum(arr)
+    else:
+        print("NO")
+print(sums)
+profiler.disable()
+print()
+ps = pstats.Stats(profiler).strip_dirs().sort_stats(
+    'tottime')  # Sorting by cumulative time
+ps.print_stats(15)
+
+def powerset(arr):
+    """Return the power set of an array."""
+    return list(chain.from_iterable(combinations(arr, r) for r in range(len(arr)+1)))
+
+def splittablesets(arr):
+    splittable = [arr]
+    
+    def recursiveSplit(arr, spliceIndex = 0):
+        if len(arr) == 2:
+            return
+        
+        for i in range(spliceIndex, len(arr)):
+            newarr = arr[0:i] + arr[i+1:]
+            splittable.append(newarr)
+            recursiveSplit(newarr, i)
+    
+    recursiveSplit(arr)        
+    return splittable
+def two_subsets(arr):
+    """Return all possible partitions of an array into two non-empty subsets."""
+    n = len(arr)
+    result = []
+    for r in range(1, n):  # Go from 1 to n-1
+        for subset in combinations(arr, r):
+            for s in range(1, n-r+1):  # Go from 1 to the remaining length
+                for subset2 in combinations([x for x in arr if x not in subset], s):
+                    result.append((list(subset), list(subset2)))
+    return result
+# print(list(combinations([1,2,3,4,5],2)))
+# exit()
