@@ -1,0 +1,76 @@
+import math
+
+def distinctPowers(n):
+    arr = set()
+    for a in range(2, n + 1):
+        for b in range(2, n + 1):
+            if log and a**b in arr:
+                print(a,b,a**b)
+            else:
+                arr.add(a**b)
+    return len(arr)
+
+def distinctPowers2(n):
+    """
+    Goes through successive powers of numbers to subtract overcounts.
+    """
+    # Use a sieve to skip powers later
+    sieve = [True] * (n + 1)
+
+    distinctTerms = (n-1)**2
+
+    """
+    There are lots of intuitions about primes and powers and divisibility here, but we'll optimize later.
+    """
+    for base in range(2, n+1):
+        if sieve[base]:
+            power = 2
+
+            # base**power = a
+            while base**power <= n:
+                sieve[base**power] = False
+
+                for b in range(2, n+1):
+                    # Check if there's a prior collision
+                    combined_power = power*b
+
+                    prevPower = power - 1
+                    
+                    # If b has made a larger number than seen previously.
+                    if combined_power / prevPower > n:
+                        break
+
+                    # Find the last previous power that could've also made this number
+                    while combined_power % prevPower != 0:
+                        prevPower -= 1
+                    
+                    if combined_power // prevPower <= n:
+                        # Collision, since if the quotient is less than n, it was covered by a previous power.
+                        # if log:
+                        #     print(base**power, b, base**combined_power)
+                        distinctTerms -= 1
+
+                power += 1
+    return distinctTerms
+
+import cProfile
+import pstats
+
+log = False
+profiler = cProfile.Profile()
+profiler.enable()
+
+# for n in range(5,200):
+#     if distinctPowers(n) != distinctPowers2(n):
+#         log = True
+#         print(n)
+#         print(distinctPowers(n))
+#         print(distinctPowers2(n))
+#         exit()
+# print("Success.")
+distinctPowers2(30000)
+
+profiler.disable()
+ps = pstats.Stats(profiler).strip_dirs().sort_stats(
+    'tottime')  # Sorting by cumulative time
+ps.print_stats(15)
