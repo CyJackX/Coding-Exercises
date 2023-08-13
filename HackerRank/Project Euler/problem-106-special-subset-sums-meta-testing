@@ -1,0 +1,298 @@
+"""
+25 possible subset pairs?  Let's count:
+a,b
+a,c
+a,d
+a,bc
+a,bd
+a,cd
+a,bcd
+b,c
+b,d
+b,ac
+b,ad
+b,cd
+b,acd
+c,d
+c,ab
+c,ad
+c,bd
+c,abd
+d,ab
+d,ac
+d,bc
+d,abc
+ab,cd
+ac,bd
+ad,bc
+
+[a,b,c,d] is in ascending order.  So, there should be a way to logic out which pairing needs to be checked for equality.
+First of all, we can eliminate all unequal subsets. That only leaves the singles and the doubles.
+
+Then, we can eliminate all the singles, since they're definitely different.
+So, it comes down to the three pairs: (ab,cd), (ac,bd), and (ad,bc).
+Now, only knowing that the numbers are strictly increasing, we then know that (ab,cd) cannot be equal, since it's the two smaller numbers against the two larger numbers:
+If a < b < c < d, then a < c and b < d, meaning a + b < c + d. We can rule (ab,cd) out.
+Then, a < b and c < d, so a + c must be less than b + d. We can rule (ac,bd) out.
+Lastly, a < b but d > c! So, a + d ? b + c. The lone ambiguity is (ad,bc).
+
+Boy, this will be a doozy to suss out; it doesn't seem so far to have a ton in common with the exact ideals of the previous special subset problems, but in terms of optimizing, it should be similar in that you only need to evaluate specific paired terms.  It's a matter of identifying those paired terms.
+
+What it does have in common, though, is efficiently creating these unique set pairs.  That's probably where the evaluation(s) will be; how can I generalize what I just did, and in less than O(n^2) time?
+--
+First off, I'll only need to construct even pairs of large enough subsets.  This seems similar to generating permutations, but not entirely...
+--
+Okay, since 1000000 choose 2 is explosively high, it's clear that there's got to be a way to skip all of the trivial cases and count more directly.
+But this makes sense; say we had set {a,b,c...z}.  There's no need to compare any other two-set against {y,z}, all other 2-sets will be smaller. And any other set will be bigger than {a,b}.  And perhaps there are other intuitions about the second rule that might help? Knowing that a + b > z, a + b + c > y + z, etc.  So, for a set-pair to be ambiguous, they must "overlap" in terms of where they pull from in the set. {a,z} vs. {b,y} is ambiguous.
+
+But, also considering {a,y} < {b,z}, since both terms on the left are less than a respective term on the right, that's not ambiguous.  Maybe that's it; can every element in one set be matched in the same inequality with an element from the other?  Might need to build out two 3-sets to compare...
+{a,b,c} < {d,e,f}, {a,b,d} < {c,e,f}, {a,b,f} ? {d,e,c}
+At this point it might be worth building out something that can actually build the sets, let alone test them.
+--
+If n = 7 requires evaluating 70 set-pairs, but (7 choose 3) = 35 and (7 choose 2) equals 21, how are there enough sets to compare?
+--
+Nevermind, I see now that, with expanded numbers of pairs, there are expanded combinations...
+I think I'll need to see the combinations before I can really see any patterns...
+--
+I've sussed it out; of the pair-set combinations, only the ones that are inconsistent in inequalities require testing.  To test this, build all your pair-sets so the sets are in ascending order.  Then, comparing them pair-wise should be straightforward.  However, this is certainly not optimized, although it'll work for now lower n.
+--
+https://math.stackexchange.com/questions/417156/finding-formula-for-partial-sum-of-polynomial-terms
+"""
+import pstats
+import cProfile
+from itertools import combinations
+from collections import Counter
+import math
+
+modulo = 10**9 + 7
+
+
+def extended_gcd(a, b):
+    if a == 0:
+        return (b, 0, 1)
+    else:
+        g, y, x = extended_gcd(b % a, a)
+        return (g, x - (b // a) * y, y)
+
+
+def modinv(a, m):
+    """Compute the modular inverse of a modulo m."""
+    g, x, y = extended_gcd(a, m)
+    if g != 1:
+        raise Exception('Modular inverse does not exist')
+    else:
+        return x % m
+
+
+def nCr(n, r):
+    """
+    n choose r, with modulo.
+    """
+    num = 1
+    denom = 1
+    for i in range(1, r + 1):
+        num = num * (n - i + 1) % modulo
+        denom = denom * i % modulo
+    return (num * modinv(denom, modulo)) % modulo
+    for i in range(1, r + 1):
+        num = num * (n - i + 1) // i
+    return num % modulo
+
+
+def calc_ambiguous_pairsets(totalsetSize, subsetSize):
+
+    # Using Pascal's Triangle sum-containing properties to sum figurate numbers
+    # offset = subsetSize - 1
+    # multiplier = nCr(subsetSize + offset, offset - 1)
+    multiplier = nCr(2*subsetSize - 1, subsetSize - 2)
+
+    # degree = subsetSize*2 - 1
+    # termsToSum = totalsetSize - 2*subsetSize + 1
+    # sumOfTerms = nCr(termsToSum + degree, termsToSum - 1)
+    sumOfTerms = nCr(totalsetSize, totalsetSize - 2*subsetSize)
+
+    return multiplier * sumOfTerms % modulo
+
+def moduloFactorial(n):
+    i = 1
+    for j in range(2, n + 1):
+        i = (i * j) % modulo
+    return i
+
+
+def efficientCalc(T, s):
+    numerator = 1
+    for i in range(T-2*s + 1, T+1):
+        numerator = numerator * i % modulo
+    denominator = moduloFactorial(s-2)**2 * 2*s**2*(s**2 - 1) % modulo
+    return numerator * modinv(denominator, modulo) % modulo
+
+
+def a(n):
+    if n < 4:
+        return 0
+
+    prev = [0,0,0,1]
+    for i in range(5, n+1):
+        prev.append(((
+            3*i**2 - 7*i - 5)*prev[-1] + (i-3)*(i-1)*prev[-2] - 3*(i-2)*(i-1)*prev[-3]) * modinv((i-4)*(i+2),modulo) % modulo)
+        prev.pop(0)
+
+    return prev[3]
+
+def specialSumMetaConditions(n):
+    count = 0
+    for subsetSize in range(2, n//2 + 1):
+        count = (count + efficientCalc(n, subsetSize)) % modulo
+
+    return count
+def approx(n):
+    return (3**(n+.5))/(4*math.sqrt(math.pi*n))
+
+
+# exit()
+# inputs = [int(input()) for _ in range(int(input()))]
+    
+# modulo = 10**9 + 7
+
+# prev = [0,0,0,0,1]
+# for i in range(5, 10**6+1):
+#     prev.append(((
+#         3*i**2 - 7*i - 5)*prev[-1] + (i-3)*(i-1)*prev[-2] - 3*(i-2)*(i-1)*prev[-3]) * modinv((i-4)*(i+2),modulo) % modulo)
+        
+# for n in inputs:
+#     print(prev[n])
+
+# inputs = [3,4,7]
+inputs = [12]
+profiler = cProfile.Profile()
+profiler.enable()
+
+for totalsetSize in inputs:
+
+    # print(specialSumMetaConditions(totalsetSize))
+    print(a(totalsetSize))
+    print(approx(totalsetSize))
+
+profiler.disable()
+print()
+ps = pstats.Stats(profiler).strip_dirs().sort_stats(
+    'tottime')  # Sorting by cumulative time
+ps.print_stats(15)
+
+
+# DEPRECATED
+
+def nthSum_from_finiteDifs(n, finiteDifferences):
+    """
+    Given the leftmost column of finite differences, calculate the nth sum of the implied polynomial.
+    Uses properties of Pascal's Triangle, Binomical Coefficients.
+    """
+    coefficients = yieldNthRowPascal(n)
+    next(coefficients)  # Skip 1
+    sum = 0
+    length = min(n, len(finiteDifferences))
+    for i in range(length):
+        sum += next(coefficients)*finiteDifferences[i]
+        sum %= modulo
+    return sum
+
+
+def yieldNthRowPascal(N):
+    """
+    Yields the terms of the nth row of Pascal's Triangle.
+    """
+    # nC0 = 1
+    prev = 1
+    # row = [1]
+    yield 1
+    for i in range(1, N + 1):
+
+        # nCr = (nCr-1 * (n - r + 1))/r
+        curr = (prev * (N - i + 1))
+        yield curr
+        prev = curr
+
+
+def finiteDifferences(arr):
+    """
+    Given an array of terms, find as many finite terms as possible.
+    """
+    for i in range(1, len(arr)):
+        print(arr)
+        if all(x == 0 for x in arr):
+            print("Degree:", i - 2)
+            return
+        arr = [arr[i] - arr[i-1] for i in range(1, len(arr))]
+    print("Degree not Determined")
+
+# totalsetSize = 8
+# subsetSize = 3
+# print(calc_ambiguous_pairsets(totalsetSize, subsetSize))
+# print(buildPairSetsBrute([x for x in range(1, totalsetSize + 1)], subsetSize))
+
+
+def figurateGenerator(n):
+    """
+    Yields successive terms of an n-figurate, i.e. triangular, tetrahedral, pentagonal numbers.
+    """
+    count, numerator, denominator = 1, 1, 1
+    while True:
+        yield numerator//denominator
+        count += 1
+        numerator = count
+        denominator = 1
+        for i in range(1, n):
+            numerator *= (count + i)
+            if numerator % (i+1) == 0:
+                numerator //= (i+1)
+            else:
+                denominator *= (i+1)
+        numerator //= denominator
+
+
+def buildPairSetsBrute(array, setSize):
+    """
+    Prints the sorted, same-size subset pairs from an array.
+    """
+    n = len(array) - 2
+    combos = list(combinations(array, setSize))
+    pairs = set()
+    for i in range(len(combos)):
+        for j in range(i + 1, len(combos)):
+            combo1, combo2 = combos[i], combos[j]
+            if not set(combo1) & set(combo2) and not consistent((combo1, combo2)):
+                pairs.add((combo1, combo2))
+    pairs = list(pairs)
+
+    # Print Results
+    if True:
+        pairs.sort()
+        categoryValue = ()
+        counts = []
+        count = 0
+        runningSum = 0
+        for pair in enumerate(pairs, 1):
+            if pair[1][0][0] != categoryValue:
+                runningSum += count
+                counts.append(count)
+                print(runningSum, categoryValue, count)
+                categoryValue = pair[1][0][0]
+                count = 0
+            count += 1
+
+        counts.append(count)
+        runningSum += count
+        print(runningSum, categoryValue, count)
+
+        counts.sort()
+        # finiteDifferences(counts[1:])
+
+    return len(pairs)
+
+
+def consistent(setPair):
+    """
+    Checks whether every element of the arr1 is pair-wise less than the elements of arr2
+    """
+    return all(x < y for x, y in zip(setPair[0], setPair[1]))
