@@ -1,5 +1,4 @@
-# freeCodeCamp
-Andy's repository of freeCodeCamp exercises to remember
+Andy's repository of coding exercises.
 
 I like Project Euler problems, they're pretty fun to keep track of, especially as they start encouraging more complex algorithms relating to encryption or whatnot.
 
