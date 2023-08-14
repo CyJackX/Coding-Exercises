@@ -198,16 +198,16 @@ public class Solution2594
 
 }
 
-public class Program2594
-{
-    public static void Main(string[] args)
-    {
-        int[] ranks = new int[] { 3, 1, 3, 1, 4, 7, 4, 6, 5, 5, 1, 2, 1, 2, 1, 7, 2, 6, 3, 7, 1, 1, 2, 4, 6, 2, 4, 5, 4, 6, 5, 7, 5, 7, 3, 1, 5, 6, 7, 5 };
-        int cars = 2234;
+// public class Program2594
+// {
+//     public static void Main(string[] args)
+//     {
+//         int[] ranks = new int[] { 3, 1, 3, 1, 4, 7, 4, 6, 5, 5, 1, 2, 1, 2, 1, 7, 2, 6, 3, 7, 1, 1, 2, 4, 6, 2, 4, 5, 4, 6, 5, 7, 5, 7, 3, 1, 5, 6, 7, 5 };
+//         int cars = 2234;
 
-        long result = (new Solution2594()).RepairCars(ranks, cars);
-        long result2 = 0; //(new Solution2594()).RepairCarsOG(ranks, cars);
+//         long result = (new Solution2594()).RepairCars(ranks, cars);
+//         long result2 = 0; //(new Solution2594()).RepairCarsOG(ranks, cars);
 
-        Console.WriteLine($"{result}, vs {result2}");
-    }
-}
+//         Console.WriteLine($"{result}, vs {result2}");
+//     }
+// }
