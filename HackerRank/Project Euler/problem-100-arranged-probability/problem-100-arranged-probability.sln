@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "problem-100-arranged-probability", "..\problem-100-arranged-probability\problem-100-arranged-probability.csproj", "{B918DF1A-6271-44F1-87CA-4025F716ABA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeetCodeCSharp", "..\..\..\LeetCode\LeetCodeCSharp\LeetCodeCSharp.csproj", "{41FDC8DA-FD66-42E1-90A6-DB620FAF78CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{B918DF1A-6271-44F1-87CA-4025F716ABA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B918DF1A-6271-44F1-87CA-4025F716ABA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B918DF1A-6271-44F1-87CA-4025F716ABA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41FDC8DA-FD66-42E1-90A6-DB620FAF78CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41FDC8DA-FD66-42E1-90A6-DB620FAF78CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41FDC8DA-FD66-42E1-90A6-DB620FAF78CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41FDC8DA-FD66-42E1-90A6-DB620FAF78CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -7,5 +7,5 @@ build_property.InvariantGlobalization =
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
-build_property.RootNamespace = problem_100_arranged_probability
-build_property.ProjectDir = X:\My Drive\Coding Exercises\HackerRank\Project Euler\problem-100-arranged-probability\
+build_property.RootNamespace = LeetCodeCSharp
+build_property.ProjectDir = X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\

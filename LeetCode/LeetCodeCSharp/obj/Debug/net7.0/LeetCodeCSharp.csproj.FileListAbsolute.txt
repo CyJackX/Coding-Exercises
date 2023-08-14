@@ -1,0 +1,15 @@
+X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\bin\Debug\net7.0\LeetCodeCSharp.exe
+x:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\bin\Debug\net7.0\LeetCodeCSharp.deps.json
+x:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\bin\Debug\net7.0\LeetCodeCSharp.runtimeconfig.json
+X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\bin\Debug\net7.0\LeetCodeCSharp.dll
+X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\bin\Debug\net7.0\LeetCodeCSharp.pdb
+X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\obj\Debug\net7.0\LeetCodeCSharp.csproj.AssemblyReference.cache
+X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\obj\Debug\net7.0\LeetCodeCSharp.GeneratedMSBuildEditorConfig.editorconfig
+X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\obj\Debug\net7.0\LeetCodeCSharp.AssemblyInfoInputs.cache
+X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\obj\Debug\net7.0\LeetCodeCSharp.AssemblyInfo.cs
+X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\obj\Debug\net7.0\LeetCodeCSharp.csproj.CoreCompileInputs.cache
+X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\obj\Debug\net7.0\LeetCodeCSharp.dll
+X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\obj\Debug\net7.0\refint\LeetCodeCSharp.dll
+X:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\obj\Debug\net7.0\LeetCodeCSharp.pdb
+x:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\obj\Debug\net7.0\LeetCodeCSharp.genruntimeconfig.cache
+x:\My Drive\Coding Exercises\LeetCode\LeetCodeCSharp\obj\Debug\net7.0\ref\LeetCodeCSharp.dll

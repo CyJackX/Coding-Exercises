@@ -8,12 +8,12 @@
             // Use IntelliSense to find out which attributes exist for C# debugging
             // Use hover for the description of the existing attributes
             // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
-            "name": ".NET Core Launch (console)",
+            "name": ".NET Core Launch LeetCode (console)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/HackerRank/Project Euler/problem-100-arranged-probability/bin/Debug/net7.0/problem-100-arranged-probability.dll",
+            "program": "${workspaceFolder}/LeetCode/LeetCodeCSharp/bin/Debug/net7.0/LeetCodeCSharp.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
@@ -22,7 +22,6 @@
             "stopAtEntry": false
         },
        
-        
         {
             "name": "Python: Current File",
             "type": "python",
